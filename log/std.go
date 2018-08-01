@@ -7,7 +7,9 @@ type stdHandler struct {
 }
 
 func stdInit() *stdHandler {
-	return new(stdHandler)
+	return &stdHandler{
+		logger: new(logrus.Logger),
+	}
 }
 
 func (fh *stdHandler) info(format string, args ...interface{}) {
