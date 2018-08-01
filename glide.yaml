@@ -2,6 +2,3 @@ package: mytoken/go_sdk
 import:
 - package: github.com/Sirupsen/logrus
   version: ^1.0.5
-- package: github.com/Showmax/sockrus
-- package: github.com/bshuster-repo/logrus-logstash-hook
-  version: ~1.0.0-beta
