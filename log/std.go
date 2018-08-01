@@ -1,15 +1,21 @@
 package log
 
-import "github.com/Sirupsen/logrus"
+import (
+	"os"
+
+	"github.com/Sirupsen/logrus"
+)
 
 type stdHandler struct {
 	logger *logrus.Logger
 }
 
 func stdInit() *stdHandler {
-	return &stdHandler{
-		logger: new(logrus.Logger),
-	}
+	sh := new(stdHandler)
+	lg := logrus.New()
+	lg.Out = os.Stdout
+	sh.logger = lg
+	return sh
 }
 
 func (fh *stdHandler) info(format string, args ...interface{}) {

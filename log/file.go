@@ -19,7 +19,6 @@ func fileInit(conf *Config) *FileHandler {
 			logger: make(map[string]*logrus.Logger),
 		}
 	)
-
 	ilg := logrus.New()
 	iw, err = os.OpenFile(path.Join(conf.Dir, "info.log"), os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {

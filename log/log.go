@@ -62,7 +62,7 @@ func Init(conf *Config) {
 	if conf.Stdout == true {
 		hs = append(hs, stdInit())
 	}
-	if isDir(conf.Dir) {
+	if conf.Dir != "" && isDir(conf.Dir) {
 		hs = append(hs, fileInit(conf))
 	}
 }
