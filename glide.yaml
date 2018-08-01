@@ -1,3 +1,4 @@
 package: mytoken/go_sdk
 import:
-- package: github.com/alecthomas/log4go
+- package: github.com/Sirupsen/logrus
+  version: ^1.0.5

@@ -1,8 +1,6 @@
-hash: 7e4bc8235dedaef5a6d583c6d8c366a33e5e86789ce773433475ff0f720aa9a2
-updated: 2018-07-27T15:39:44.605566+08:00
+hash: 3c0280363316b0367c0ee860919f99339f62c1f9637ebfbd3e76ee15d8fe9823
+updated: 2018-08-01T12:37:26.853308+08:00
 imports:
-- name: github.com/alecthomas/log4go
-  version: d146e6b86faab5f7e4d135cc63b749d74bf0d4a6
-- name: github.com/pkg/errors
-  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
+- name: github.com/Sirupsen/logrus
+  version: 3e01752db0189b9157070a0e1668a620f9a85da2
 testImports: []
