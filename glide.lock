@@ -1,6 +1,19 @@
-hash: 3c0280363316b0367c0ee860919f99339f62c1f9637ebfbd3e76ee15d8fe9823
-updated: 2018-08-01T12:37:26.853308+08:00
+hash: cd5a2326c8c7a4ee4bc5df2de8dea6233d00bad0d3ce5fec19f2de05cc1c0008
+updated: 2018-08-01T15:49:09.481148+08:00
 imports:
+- name: github.com/bshuster-repo/logrus-logstash-hook
+  version: ea59b04518367f2aafe8cf6d46a7d60605d075ce
+- name: github.com/Showmax/sockrus
+  version: db781913d916ad224470eaa2172059976bcf2e82
 - name: github.com/Sirupsen/logrus
   version: 3e01752db0189b9157070a0e1668a620f9a85da2
+- name: golang.org/x/crypto
+  version: 613d6eafa307c6881a737a3c35c0e312e8d3a8c5
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: 78d5f264b493f125018180c204871ecf58a2dce1
+  subpackages:
+  - unix
+  - windows
 testImports: []

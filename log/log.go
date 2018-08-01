@@ -31,25 +31,8 @@ type AgentConfig struct {
 	TaskID  string
 	Proto   string
 	Addr    string
-	Buffer  int
 	Chan    int
 	Timeout time.Duration
-}
-
-type D struct {
-	Index    string   `json:"@index"`
-	Type     string   `json:"@type"`
-	Time     xtime    `json:"datetime"`
-	UniqueID string   `json:"unique_id"`
-	UID      int      `json:"uid"`
-	Info     *logInfo `json:"info"`
-}
-
-type logInfo struct {
-	Host    string `json:"host"`
-	Extra   string `json:"extra"`
-	Message string `json:"message"`
-	Context string `json:"context"`
 }
 
 func (xt xtime) MarshalJSON() ([]byte, error) {
@@ -64,6 +47,9 @@ func Init(conf *Config) {
 	}
 	if conf.Dir != "" && isDir(conf.Dir) {
 		hs = append(hs, fileInit(conf))
+	}
+	if conf.Agent != nil {
+		hs = append(hs, agentInit(conf.Agent))
 	}
 }
 
