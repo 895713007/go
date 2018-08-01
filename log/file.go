@@ -59,15 +59,15 @@ func (fh *FileHandler) info(format string, args ...interface{}) {
 }
 
 func (fh *FileHandler) warn(format string, args ...interface{}) {
-	fh.logger["info"].Warnf(format, args...)
+	fh.logger["warn"].Warnf(format, args...)
 }
 
 func (fh *FileHandler) debug(format string, args ...interface{}) {
-	fh.logger["info"].Debugf(format, args...)
+	fh.logger["debug"].Debugf(format, args...)
 }
 
 func (fh *FileHandler) error(format string, args ...interface{}) {
-	fh.logger["info"].Errorf(format, args...)
+	fh.logger["error"].Errorf(format, args...)
 }
 
 func isDir(path string) bool {
