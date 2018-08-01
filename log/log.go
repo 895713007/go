@@ -42,14 +42,14 @@ func (xt xtime) MarshalJSON() ([]byte, error) {
 
 // Init create logger with context.
 func Init(conf *Config) {
-	if conf.Stdout == true {
-		hs = append(hs, stdInit())
-	}
 	if conf.Dir != "" && isDir(conf.Dir) {
 		hs = append(hs, fileInit(conf))
 	}
 	if conf.Agent != nil {
 		hs = append(hs, agentInit(conf.Agent))
+	}
+	if conf.Stdout == true || len(hs) == 0 {
+		hs = append(hs, stdInit())
 	}
 }
 
