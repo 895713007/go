@@ -6,6 +6,8 @@ import (
 	"net"
 	"os"
 	"time"
+
+	"github.com/rs/xid"
 )
 
 type D struct {
@@ -75,5 +77,5 @@ func (ah *agentHandler) logf(l string, format string, args ...interface{}) {
 }
 
 func (ah *agentHandler) uniqueID() string {
-	return "tests"
+	return xid.New().String()
 }
