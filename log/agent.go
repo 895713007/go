@@ -64,7 +64,7 @@ func (ah *agentHandler) logf(l string, format string, args ...interface{}) {
 	di.Message = fmt.Sprintf(format, args...)
 	di.Host, _ = os.Hostname()
 	data := D{
-		Index:    ah.conf.TaskID,
+		Index:    ah.taskIndex(l),
 		Time:     xtime(time.Now()),
 		Level:    l,
 		UniqueID: ah.uniqueID(),
@@ -77,4 +77,8 @@ func (ah *agentHandler) logf(l string, format string, args ...interface{}) {
 
 func (ah *agentHandler) uniqueID() string {
 	return xid.New().String()
+}
+
+func (ah *agentHandler) taskIndex(l string) string {
+	return fmt.Sprintf(ah.conf.TaskID, l)
 }
