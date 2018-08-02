@@ -74,6 +74,7 @@ func (ah *agentHandler) logf(l string, format string, args ...interface{}) {
 		Info:     di,
 	}
 	b, _ := json.Marshal(data)
+	fmt.Println(string(b))
 	if _, err := ah.conn.Write(b); err != nil {
 	}
 }
