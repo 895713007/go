@@ -67,6 +67,7 @@ func (ah *agentHandler) logf(l string, format string, args ...interface{}) {
 	di.Host, _ = os.Hostname()
 	data := D{
 		Index:    ah.taskIndex(l),
+		Type:     ah.taskIndex(l),
 		Time:     xtime(time.Now()),
 		Level:    l,
 		UniqueID: ah.uniqueID(),
