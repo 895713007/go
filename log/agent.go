@@ -82,5 +82,5 @@ func (ah *agentHandler) uniqueID() string {
 }
 
 func (ah *agentHandler) taskIndex(l string) string {
-	return fmt.Sprintf(ah.conf.TaskID, l)
+	return ah.conf.TaskID
 }
