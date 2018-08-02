@@ -21,10 +21,10 @@ type D struct {
 }
 
 type logInfo struct {
-	Host    string `json:"host"`
-	Extra   string `json:"extra"`
-	Message string `json:"message"`
-	Context string `json:"context"`
+	Host    string                 `json:"host"`
+	Extra   map[string]interface{} `json:"extra"`
+	Message string                 `json:"message"`
+	Context map[string]interface{} `json:"context"`
 }
 
 type agentHandler struct {
@@ -62,6 +62,8 @@ func (ah *agentHandler) error(format string, args ...interface{}) {
 func (ah *agentHandler) logf(l string, format string, args ...interface{}) {
 	di := new(logInfo)
 	di.Message = fmt.Sprintf(format, args...)
+	di.Extra = make(map[string]interface{})
+	di.Context = make(map[string]interface{})
 	di.Host, _ = os.Hostname()
 	data := D{
 		Index:    ah.taskIndex(l),
