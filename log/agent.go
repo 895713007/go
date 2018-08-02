@@ -68,12 +68,13 @@ func (ah *agentHandler) logf(l string, format string, args ...interface{}) {
 	data := D{
 		Index:    ah.taskIndex(l),
 		Type:     ah.taskIndex(l),
-		Time:     xtime(time.Now()),
+		Time:     xtime(time.Now().In(tz)),
 		Level:    l,
 		UniqueID: ah.uniqueID(),
 		Info:     di,
 	}
 	b, _ := json.Marshal(data)
+	fmt.Println(string(b))
 	if _, err := ah.conn.Write(b); err != nil {
 	}
 }
