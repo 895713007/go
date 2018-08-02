@@ -43,7 +43,7 @@ func (xt xtime) MarshalJSON() ([]byte, error) {
 
 // Init create logger with context.
 func Init(conf *Config) {
-	tz, _ = time.LoadLocation("RPC")
+	tz, _ = time.LoadLocation("Asia/shanghai")
 	if conf.Dir != "" && isDir(conf.Dir) {
 		hs = append(hs, fileInit(conf))
 	}
