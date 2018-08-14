@@ -44,7 +44,7 @@ func fileInit(conf *Config) *FileHandler {
 	fh.logger["debug"] = dlg
 
 	elg := logrus.New()
-	ew, err = os.OpenFile(path.Join(conf.Dir, "info.log"), os.O_CREATE|os.O_WRONLY, 0666)
+	ew, err = os.OpenFile(path.Join(conf.Dir, "error.log"), os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		panic(err)
 	}
