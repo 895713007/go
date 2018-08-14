@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"time"
+	"os"
 )
 
 var (
@@ -76,4 +77,5 @@ func Error(format string, args ...interface{}) {
 	for _, h := range hs {
 		h.error(format, args...)
 	}
+	os.Exit(1)
 }
