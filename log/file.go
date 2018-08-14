@@ -3,7 +3,6 @@ package log
 import (
 	"os"
 	"path"
-
 	"github.com/Sirupsen/logrus"
 )
 
@@ -68,6 +67,7 @@ func (fh *FileHandler) debug(format string, args ...interface{}) {
 
 func (fh *FileHandler) error(format string, args ...interface{}) {
 	fh.logger["error"].Errorf(format, args...)
+	os.Exit(1)
 }
 
 func isDir(path string) bool {
