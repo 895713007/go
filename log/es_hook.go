@@ -14,7 +14,6 @@ const (
 )
 
 type EsLogHook struct {
-	Env    string
 	Server string
 	Conn   net.Conn
 }
@@ -35,16 +34,13 @@ type logInfo struct {
 	Context map[string]interface{} `json:"context"`
 }
 
-func NewEsLogHook(env, server string) *EsLogHook {
-	if env == "" {
-		env = "dev"
-	}
+func NewEsLogHook(server string) *EsLogHook {
 	conn, err := net.Dial("udp", server)
 	if err != nil {
 		logrus.Errorf("failed dail log server %v", server)
 		os.Exit(1)
 	}
-	return &EsLogHook{env, server, conn}
+	return &EsLogHook{server, conn}
 }
 
 func (hook *EsLogHook) Fire(entry *logrus.Entry) error {

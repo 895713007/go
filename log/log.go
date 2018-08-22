@@ -22,12 +22,7 @@ func init() {
 
 	server := os.Getenv("LOG_SERVER")
 	if server != "" {
-		env := os.Getenv("LOG_ENV")
-		if env == "" {
-			env = "dev"
-		}
-
-		log.AddHook(NewEsLogHook(env, server))
+		log.AddHook(NewEsLogHook(server))
 	}
 	SetExtra(map[string]interface{}{
 		"command": os.Args[0],

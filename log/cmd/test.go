@@ -16,4 +16,10 @@ func main() {
 	log.WithFields(logrus.Fields{"aa":"bb", "cc": logrus.Fields{"dd":"aaaaaaa"}}, "test").Infof("test obj")
 
 	log.Type("test").Info("fdsafdas")
+
+	fields := logrus.Fields{
+		"aa": "bb",
+		"cc": "dd",
+	}
+	log.Type("test").WithFields(fields).Info("log with fields and type")
 }
