@@ -1,81 +1,100 @@
 package log
 
 import (
-	"fmt"
-	"time"
 	"os"
+	"github.com/sirupsen/logrus"
+	"github.com/rs/xid"
+	"github.com/json-iterator/go"
 )
 
-var (
-	c  *Config
-	tz *time.Location
-	hs = make([]handle, 0)
-)
+const typeField = "log_type"
 
-type handle interface {
-	info(format string, args ...interface{})
-	warn(format string, args ...interface{})
-	debug(format string, args ...interface{})
-	error(format string, args ...interface{})
-}
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-type xtime time.Time
+var log = logrus.New()
+var extra map[string]interface{}
+var uniqueId string
+var hostname, _ = os.Hostname()
 
-// Config log config.
-type Config struct {
-	Stdout bool
-	Dir    string
-	Agent  *AgentConfig
-}
+func init() {
+	log.SetOutput(os.Stdout)
+	log.SetLevel(logrus.DebugLevel)
 
-// AgentConfig agent config.
-type AgentConfig struct {
-	TaskID  string
-	Proto   string
-	Addr    string
-	Chan    int
-	Timeout time.Duration
-}
-
-func (xt xtime) MarshalJSON() ([]byte, error) {
-	var stamp = fmt.Sprintf("\"%s\"", time.Time(xt).Format("2006-01-02 15:04:05"))
-	return []byte(stamp), nil
-}
-
-// Init create logger with context.
-func Init(conf *Config) {
-	tz, _ = time.LoadLocation("Asia/shanghai")
-	if conf.Dir != "" && isDir(conf.Dir) {
-		hs = append(hs, fileInit(conf))
+	server := os.Getenv("LOG_SERVER")
+	if server != "" {
+		log.AddHook(NewEsLogHook(server))
 	}
-	if conf.Agent != nil {
-		hs = append(hs, agentInit(conf.Agent))
-	}
-	if conf.Stdout == true || len(hs) == 0 {
-		hs = append(hs, stdInit())
-	}
+	SetExtra(map[string]interface{}{
+		"command": os.Args[0],
+	})
 }
 
-func Info(format string, args ...interface{}) {
-	for _, h := range hs {
-		h.info(format, args...)
-	}
+func SetExtra(h map[string]interface{}) {
+	extra = h
+	RefreshUniqueId()
 }
 
-func Warn(format string, args ...interface{}) {
-	for _, h := range hs {
-		h.warn(format, args...)
-	}
-}
-func Debug(format string, args ...interface{}) {
-	for _, h := range hs {
-		h.debug(format, args...)
-	}
+func RefreshUniqueId() {
+	uniqueId = xid.New().String()
 }
 
-func Error(format string, args ...interface{}) {
-	for _, h := range hs {
-		h.error(format, args...)
-	}
-	os.Exit(1)
+func Type(typ string) *logrus.Entry {
+	return log.WithField(typeField, typ)
+}
+
+func WithField(key string, value interface{}, typ string) *logrus.Entry {
+	return log.WithField(typeField, typ).WithField(key, value)
+}
+
+func WithFields(fields logrus.Fields, typ string) *logrus.Entry {
+	fields[typeField] = typ
+	return log.WithFields(fields)
+}
+
+func Info(v ...interface{}) {
+	log.Info(v...)
+}
+
+func Infof(format string, v ...interface{}) {
+	log.Infof(format, v...)
+}
+
+func Debug(v ...interface{}) {
+	log.Debug(v...)
+}
+
+func Debugf(format string, v ...interface{}) {
+	log.Debugf(format, v...)
+}
+
+func Warn(v ...interface{}) {
+	log.Warning(v...)
+}
+
+func Warnf(format string, v ...interface{}) {
+	log.Warningf(format, v...)
+}
+
+func Warning(v ...interface{}) {
+	log.Warning(v...)
+}
+
+func Warningf(format string, v ...interface{}) {
+	log.Warningf(format, v...)
+}
+
+func Error(v ...interface{}) {
+	log.Error(v...)
+}
+
+func Errorf(format string, v ...interface{}) {
+	log.Errorf(format, v...)
+}
+
+func Fatal(v ...interface{}) {
+	log.Fatal(v...)
+}
+
+func Fatalf(format string, v ...interface{}) {
+	log.Fatalf(format, v...)
 }

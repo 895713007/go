@@ -1,16 +1,22 @@
-hash: 2d56a81cb7dc5f9bbd9c40d91423f97c8a28f42d759a9967ed16a4cc92f90cd7
-updated: 2018-08-01T16:50:27.773764+08:00
+hash: 00a19bbca6e73dbb3af48ab7d8ef5e9ea23911b26e557b862910abf9a963c58f
+updated: 2018-08-22T18:24:46.804624+08:00
 imports:
+- name: github.com/json-iterator/go
+  version: 1624edc4454b8682399def8740d46db5e4362ba4
+- name: github.com/modern-go/concurrent
+  version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
+- name: github.com/modern-go/reflect2
+  version: 94122c33edd36123c84d5368cfb2b69df93a0ec8
 - name: github.com/rs/xid
   version: 2c7e97ce663ff82c49656bca3048df0fdd83c5f9
-- name: github.com/Sirupsen/logrus
-  version: 3e01752db0189b9157070a0e1668a620f9a85da2
+- name: github.com/sirupsen/logrus
+  version: fc587f31c804fe6853cd90f0d8d90af588eca5bd
 - name: golang.org/x/crypto
-  version: 613d6eafa307c6881a737a3c35c0e312e8d3a8c5
+  version: 614d502a4dac94afa3a6ce146bd1736da82514c6
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: 78d5f264b493f125018180c204871ecf58a2dce1
+  version: 3b58ed4ad3395d483fc92d5d14123ce2c3581fec
   subpackages:
   - unix
   - windows
