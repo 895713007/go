@@ -1,15 +1,26 @@
-# go_sdk
+## MyToken Go SDK
 
-## log
+## Log
 
-### config file
+log based on `logrus`, support sync to mytoken log server
 
-```toml
-[log]
-Stdout=false # print to terminal
-Dir="/tmp/" # log file path
-[log.agent]
-TaskID="log_test"  # elk id
-Addr="127.0.0.1:9977"
-proto="udp" # only support udp
 ```
+go get github.com/mytokenio/go_sdk/log
+
+log.Info("xxx log")
+log.WithField("kkk", "vvv").Info("log with kv data")
+```
+
+## Config
+
+...
+
+## TODO
+
+service registry/broker/health
+
+rpc server/client/protocol
+
+...
+
+
