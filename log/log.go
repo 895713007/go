@@ -18,12 +18,18 @@ var hostname, _ = os.Hostname()
 
 func init() {
 	log.SetOutput(os.Stdout)
-	log.SetLevel(logrus.DebugLevel)
 
 	server := os.Getenv("LOG_SERVER")
 	if server != "" {
+		if _level, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err != nil {
+			log.SetLevel(_level)
+		} else {
+			log.SetLevel(logrus.DebugLevel)
+		}
+
 		log.AddHook(NewEsLogHook(server))
 	}
+
 	SetExtra(map[string]interface{}{
 		"command": os.Args[0],
 	})

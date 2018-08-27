@@ -1,7 +1,7 @@
 package main
 
 import (
-	"mytoken/go_sdk/log"
+	"github.com/mytokenio/go_sdk/log"
 	"github.com/sirupsen/logrus"
 )
 
