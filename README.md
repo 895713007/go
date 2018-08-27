@@ -14,7 +14,7 @@ import (
 )
 
 log.Info("xxx log")
-log.WithField("kkk", "vvv").Info("log with kv data")
+log.WithField("kkk", "vvv", "custom_type").Info("log with type & kv data")
 ```
 
 [more detail](https://github.com/mytokenio/go_sdk/tree/master/log)
