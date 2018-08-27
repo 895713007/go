@@ -37,7 +37,7 @@ type logInfo struct {
 func NewEsLogHook(server string) *EsLogHook {
 	conn, err := net.Dial("udp", server)
 	if err != nil {
-		logrus.Errorf("failed dail log server %v", server)
+		logrus.Errorf("failed dial log server %v", server)
 		os.Exit(1)
 	}
 	return &EsLogHook{server, conn}
