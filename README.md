@@ -31,17 +31,14 @@ import (
     "github.com/mytokenio/go_sdk/config"
 )
 
-c := config.NewConfig()
+mc := &MyConfig{}
 
-// string value
-value, err := c.Get("key")
+c := config.NewConfig(config.Service("mt.user"))
+c.BindJSON(mc)
+// or
+c.BindTOML(mc)
 
-// shortcuts
-str := c.String("key")
-b := c.Bool("key")
-i := c.Int("key")
-i64 := c.Int64("key")
-f := c.Float64("key")
+// or custom unmarshal 
 ```
 
 [more detail](https://github.com/mytokenio/go_sdk/tree/master/config)
