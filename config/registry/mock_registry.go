@@ -1,49 +1,41 @@
 package registry
 
 import (
-	"time"
-	"errors"
 	"sync"
+	"github.com/mytokenio/go_sdk/log"
+	"fmt"
 )
 
 type mockRegistry struct {
-	TTL time.Duration
-	KV  map[string]string
 	sync.RWMutex
+	KV  map[string][]byte
 }
 
-func NewMockRegistry(opts ...Option) Registry {
-	var options Options
-	for _, o := range opts {
-		o(&options)
-	}
-
-	//ttl minimum 5 seconds
-	minTTL := time.Second * 5
-	if options.TTL > minTTL {
-		minTTL = options.TTL
-	}
-
+func NewMockRegistry() Registry {
 	return &mockRegistry{
-		TTL: minTTL,
-		KV:  map[string]string{},
+		KV:  map[string][]byte{},
 	}
 }
 
-func (c *mockRegistry) Get(name string) (string, error) {
+func (c *mockRegistry) Get(key string) ([]byte, error) {
 	c.RLock()
-	v, ok := c.KV[name]
+	v, ok := c.KV[key]
 	c.RUnlock()
 
 	if ok {
 		return v, nil
 	}
-	return "", errors.New("not found")
+	return nil, fmt.Errorf("mock key %s not found", key)
 }
 
-func (c *mockRegistry) Set(name string, value string) error {
+func (c *mockRegistry) Set(key string, value []byte) error {
 	c.Lock()
-	c.KV[name] = value
+	c.KV[key] = value
 	c.Unlock()
+	log.Infof("mock set %s %s", key, value)
 	return nil
+}
+
+func (c *mockRegistry) String() string {
+	return "mock"
 }

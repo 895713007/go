@@ -8,25 +8,32 @@ import (
 	"io/ioutil"
 	"bytes"
 	"fmt"
+	"encoding/json"
 )
 
 type httpRegistry struct {
 	Host       string
 	HttpClient *http.Client
-	TTL        time.Duration
 	sync.Mutex
+}
+
+type Response struct {
+	Code      int    `json:"code"`
+	Message   string `json:"message"`
+	Timestamp string `json:"timestamp"`
+	Data struct {
+		Key       string `json:"key"`
+		Value     string `json:"value"`
+		Comment   string `json:"comment"`
+		CreatedAt string `json:"created_at"`
+		UpdatedAt string `json:"updated_at"`
+	}
 }
 
 func NewHttpRegistry(opts ...Option) Registry {
 	var options Options
 	for _, o := range opts {
 		o(&options)
-	}
-
-	//ttl minimum 5 seconds
-	minTTL := time.Second * 5
-	if options.TTL > minTTL {
-		minTTL = options.TTL
 	}
 
 	timeout := time.Second * 3
@@ -36,25 +43,30 @@ func NewHttpRegistry(opts ...Option) Registry {
 
 	return &httpRegistry{
 		Host:       options.Host,
-		TTL:        minTTL,
 		HttpClient: &http.Client{Timeout: timeout},
 	}
 }
 
-func (c *httpRegistry) Get(name string) (string, error) {
-	b, err := c.request("GET", "/get", nil)
+func (c *httpRegistry) Get(key string) ([]byte, error) {
+	uri := fmt.Sprintf("/v1/config/item/%s", key)
+	b, err := c.request("GET", uri, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(b), nil
+
+	rsp := &Response{}
+	json.Unmarshal(b, rsp)
+	return []byte(rsp.Data.Value), nil
 }
 
-func (c *httpRegistry) Set(name string, value string) error {
+func (c *httpRegistry) Set(name string, value []byte) error {
 	return errors.New("todo")
 }
 
 func (c *httpRegistry) request(method string, path string, data []byte) ([]byte, error) {
-	client := &http.Client{Timeout: time.Second * 5}
+	if c.Host == "" {
+		return nil, errors.New("config server host empty")
+	}
 
 	url := c.Host + path
 	body := bytes.NewBuffer(data)
@@ -63,7 +75,7 @@ func (c *httpRegistry) request(method string, path string, data []byte) ([]byte,
 		return nil, err
 	}
 
-	resp, err := client.Do(req)
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -77,4 +89,8 @@ func (c *httpRegistry) request(method string, path string, data []byte) ([]byte,
 		err = errors.New(fmt.Sprintf("http get errcode %d, errmsg %s", resp.StatusCode, respBody))
 	}
 	return respBody, err
+}
+
+func (c *httpRegistry) String() string {
+	return "http"
 }

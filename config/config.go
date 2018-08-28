@@ -2,48 +2,96 @@ package config
 
 import (
 	"github.com/mytokenio/go_sdk/config/registry"
-	"time"
+	"github.com/mytokenio/go_sdk/log"
+	"encoding/json"
+	"errors"
+	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
+	Service  string
 	Registry registry.Registry
-	TTL time.Duration //TODO
 }
 
 func NewConfig(opts ...Option) *Config {
 	options := newOptions(opts...)
+
+	//use cache registry if ttl > 0
+	if options.TTL > 0 {
+		log.Infof("ttl %s, use cache registry", options.TTL.String())
+		cacheRegistry := registry.NewCacheRegistry(
+			registry.SubRegistry(options.Registry),
+			registry.TTL(options.TTL),
+		)
+		options.Registry = cacheRegistry
+	}
 	return &Config{
+		Service:  options.Service,
 		Registry: options.Registry,
 	}
 }
 
-// return string value by key, return error if key not found
-// return error if request failed (http registry)
-func (c *Config) Get(name string) (string, error) {
-	s, err := c.Registry.Get(name)
-	if err != nil {
-		return "", err
+//======== service config bind to struct =============
+
+// get by service name
+func (c *Config) Get() ([]byte, error) {
+	if c.Service == "" {
+		return nil, errors.New("service name not set")
 	}
-	return s, nil
+	return c.GetKey(c.Service)
 }
 
-func (c *Config) Set(name string, value string) error {
-	return c.Registry.Set(name, value)
+// bind service config to json struct
+func (c *Config) BindJSON(obj interface{}) {
+	b, err := c.Get()
+	if err != nil {
+		log.Errorf("service config error %s %s", c.Service, b)
+		return
+	}
+	e := json.Unmarshal(b, obj)
+	if e != nil {
+		log.Errorf("json unmarshal error %s", e)
+	}
 }
 
-func (c *Config) String(name string) string {
-	s, _ := c.Get(name)
-	return s
+// bind service config to toml struct
+func (c *Config) BindTOML(obj interface{}) {
+	b, err := c.Get()
+	if err != nil {
+		log.Errorf("service config error %s %s", c.Service, b)
+		return
+	}
+	e := toml.Unmarshal(b, obj)
+	if e != nil {
+		log.Errorf("toml unmarshal error %s", e)
+	}
+}
+
+//======== shortcuts for single-value key ==============
+
+// return raw value by key, return error if key not found
+// return error if request failed (http registry)
+func (c *Config) GetKey(key string) ([]byte, error) {
+	b, err := c.Registry.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+// return string
+func (c *Config) String(key string) string {
+	return c.StringOr(key, "")
 }
 
 // return string by name, or default value if not found.
-func (c *Config) StringOr(name string, dv string) string {
-	s, err := c.Registry.Get(name)
+func (c *Config) StringOr(key string, dv string) string {
+	b, err := c.GetKey(key)
 	if err != nil {
 		return dv
 	}
 
-	return s
+	return toString(b, "")
 }
 
 func (c *Config) Bool(name string) bool {
@@ -64,12 +112,12 @@ func (c *Config) Int(name string) int {
 }
 
 func (c *Config) IntOr(name string, dv int) int {
-	s, err := c.Registry.Get(name)
+	b, err := c.GetKey(name)
 	if err != nil {
 		return dv
 	}
 
-	return toInt(s, dv)
+	return toInt(b, dv)
 }
 
 func (c *Config) Int64(name string) int64 {
@@ -77,12 +125,12 @@ func (c *Config) Int64(name string) int64 {
 }
 
 func (c *Config) Int64Or(name string, dv int64) int64 {
-	s, err := c.Registry.Get(name)
+	b, err := c.GetKey(name)
 	if err != nil {
 		return dv
 	}
 
-	return toInt64(s, dv)
+	return toInt64(b, dv)
 }
 
 func (c *Config) Float64(name string) float64 {
@@ -90,12 +138,12 @@ func (c *Config) Float64(name string) float64 {
 }
 
 func (c *Config) Float64Or(name string, dv float64) float64 {
-	s, err := c.Registry.Get(name)
+	b, err := c.GetKey(name)
 	if err != nil {
 		return dv
 	}
 
-	return toFloat64(s, dv)
+	return toFloat64(b, dv)
 }
 
 //TODO, more types

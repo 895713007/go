@@ -9,14 +9,52 @@ import (
     "github.com/mytokenio/go_sdk/config"
 )
 
+```
 
-c := config.NewConfig()
+#### Service
 
-//return string value by key, return error if key not found
+shortcut for:
+1. get config raw value by service name
+2. bind raw bytes to custom struct via json or toml
+
+custom struct 
+
+```
+type MyConfig struct {...}
+```
+
+
+set service name by `config.Service`
+```
+c := config.NewConfig(config.Service("mt.user"))
+```
+
+```
+mc := &MyConfig{}
+c.BindJSON(mc)
+// or
+c.BindTOML(mc)
+```
+
+code equal to
+```
+mc := &MyConfig{}
+b, _ := c.Get()
+
+json.Unmarshal(b, mc)
+// or
+toml.Unmarshal(b, mc)
+```
+
+
+#### Get Raw Value by Key
+
+```
+//return raw value by key, return error if key not found
 //return error if request failed (http registry)
-value, err := c.Get("key")
+value, err := c.GetKey("key")
 
-// shortcut
+// shortcuts for single-value 
 str := c.String("key")
 b := c.Bool("key")
 i := c.Int("key")

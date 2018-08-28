@@ -36,7 +36,7 @@ c := config.NewConfig()
 // string value
 value, err := c.Get("key")
 
-// shortcut
+// shortcuts
 str := c.String("key")
 b := c.Bool("key")
 i := c.Int("key")

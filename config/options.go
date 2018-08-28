@@ -8,8 +8,9 @@ import (
 type Option func(*Options)
 
 type Options struct {
+	Service string
+	TTL time.Duration  //use cache registry for ttl
 	Registry registry.Registry
-	TTL time.Duration
 }
 
 func newOptions(opts ...Option) Options {
@@ -22,6 +23,12 @@ func newOptions(opts ...Option) Options {
 		o(&opt)
 	}
 	return opt
+}
+
+func Service(service string) Option {
+	return func(o *Options) {
+		o.Service = service
+	}
 }
 
 func Registry(r registry.Registry) Option {
