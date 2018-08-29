@@ -74,9 +74,4 @@ f := c.Float64Or("key", 2.345)
 
 support custom config driver, see [http_driver](https://github.com/mytokenio/go_sdk/blob/master/config/driver/http_driver.go) or [mock_driver](https://github.com/mytokenio/go_sdk/blob/master/config/driver/mock_driver.go)
 
-### TODO
-
-more shortcuts support, slice, map, etc.
-
-cache support
 
