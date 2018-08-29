@@ -1,4 +1,4 @@
-package registry
+package driver
 
 import (
 	"sync"
@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 )
 
-type httpRegistry struct {
+type httpDriver struct {
 	Host       string
 	HttpClient *http.Client
 	sync.Mutex
@@ -30,7 +30,7 @@ type Response struct {
 	}
 }
 
-func NewHttpRegistry(opts ...Option) Registry {
+func NewHttpDriver(opts ...Option) Driver {
 	var options Options
 	for _, o := range opts {
 		o(&options)
@@ -41,13 +41,13 @@ func NewHttpRegistry(opts ...Option) Registry {
 		timeout = options.Timeout
 	}
 
-	return &httpRegistry{
+	return &httpDriver{
 		Host:       options.Host,
 		HttpClient: &http.Client{Timeout: timeout},
 	}
 }
 
-func (c *httpRegistry) Get(key string) ([]byte, error) {
+func (c *httpDriver) Get(key string) ([]byte, error) {
 	uri := fmt.Sprintf("/v1/config/item/%s", key)
 	b, err := c.request("GET", uri, nil)
 	if err != nil {
@@ -59,11 +59,11 @@ func (c *httpRegistry) Get(key string) ([]byte, error) {
 	return []byte(rsp.Data.Value), nil
 }
 
-func (c *httpRegistry) Set(name string, value []byte) error {
+func (c *httpDriver) Set(name string, value []byte) error {
 	return errors.New("todo")
 }
 
-func (c *httpRegistry) request(method string, path string, data []byte) ([]byte, error) {
+func (c *httpDriver) request(method string, path string, data []byte) ([]byte, error) {
 	if c.Host == "" {
 		return nil, errors.New("config server host empty")
 	}
@@ -91,6 +91,6 @@ func (c *httpRegistry) request(method string, path string, data []byte) ([]byte,
 	return respBody, err
 }
 
-func (c *httpRegistry) String() string {
+func (c *httpDriver) String() string {
 	return "http"
 }

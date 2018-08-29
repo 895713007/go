@@ -1,29 +1,28 @@
-package registry
+package driver
 
 import (
 	"time"
 )
 
-type Registry interface {
+type Driver interface {
 	Get(string) ([]byte, error)
 	Set(string, []byte) error
 	String() string
 }
 
 var (
-	DefaultRegistry = NewHttpRegistry()
+	DefaultDriver = NewHttpDriver()
 )
 
 type Option func(*Options)
 
 type Options struct {
-	Host string     //for http registry
+	Host string     //for http driver
 	Timeout time.Duration
-	SubRegistry Registry //for cache registry
+	SubDriver Driver //for cache driver
 	TTL time.Duration
 }
 
-// Host is the registry addresse to use
 func Host(host string) Option {
 	return func(o *Options) {
 		o.Host = host
@@ -42,8 +41,8 @@ func TTL(t time.Duration) Option {
 	}
 }
 
-func SubRegistry(reg Registry) Option {
+func SubDriver(reg Driver) Option {
 	return func(o *Options) {
-		o.SubRegistry = reg
+		o.SubDriver = reg
 	}
 }

@@ -1,4 +1,4 @@
-package registry
+package driver
 
 import (
 	"sync"
@@ -12,14 +12,14 @@ type Value struct {
 	Timestamp int64
 }
 
-type cacheRegistry struct {
+type cacheDriver struct {
 	sync.RWMutex
-	SubRegistry Registry
+	SubDriver Driver
 	TTL         time.Duration
 	Data        map[string]Value
 }
 
-func NewCacheRegistry(opts ...Option) Registry {
+func NewCacheDriver(opts ...Option) Driver {
 	var options Options
 	for _, o := range opts {
 		o(&options)
@@ -35,23 +35,23 @@ func NewCacheRegistry(opts ...Option) Registry {
 		}
 	}
 
-	if options.SubRegistry == nil {
-		options.SubRegistry = DefaultRegistry
+	if options.SubDriver == nil {
+		options.SubDriver = DefaultDriver
 	}
-	log.Warnf("cache sub registry %s", options.SubRegistry.String())
-	return &cacheRegistry{
+	log.Warnf("cache sub driver %s", options.SubDriver.String())
+	return &cacheDriver{
 		TTL:         minTTL,
-		SubRegistry: options.SubRegistry,
+		SubDriver: options.SubDriver,
 		Data: map[string]Value{},
 	}
 }
 
-func (c *cacheRegistry) Get(key string) ([]byte, error) {
+func (c *cacheDriver) Get(key string) ([]byte, error) {
 	if cache := c.cacheGet(key); cache != nil {
 		return cache, nil
 	}
 
-	b, err := c.SubRegistry.Get(key)
+	b, err := c.SubDriver.Get(key)
 	if err != nil {
 		return nil, err
 	}
@@ -61,15 +61,15 @@ func (c *cacheRegistry) Get(key string) ([]byte, error) {
 	return b, nil
 }
 
-func (c *cacheRegistry) Set(key string, value []byte) error {
+func (c *cacheDriver) Set(key string, value []byte) error {
 	c.Lock()
 	delete(c.Data, key)
 	c.Unlock()
 
-	return c.SubRegistry.Set(key, value)
+	return c.SubDriver.Set(key, value)
 }
 
-func (c *cacheRegistry) cacheGet(key string) []byte {
+func (c *cacheDriver) cacheGet(key string) []byte {
 	c.RLock()
 	v, ok := c.Data[key]
 	c.RUnlock()
@@ -89,7 +89,7 @@ func (c *cacheRegistry) cacheGet(key string) []byte {
 	return v.V
 }
 
-func (c *cacheRegistry) cacheSet(key string, value []byte) error {
+func (c *cacheDriver) cacheSet(key string, value []byte) error {
 	c.Lock()
 	defer c.Unlock()
 
@@ -101,6 +101,6 @@ func (c *cacheRegistry) cacheSet(key string, value []byte) error {
 	return nil
 }
 
-func (c *cacheRegistry) String() string {
+func (c *cacheDriver) String() string {
 	return "cache"
 }

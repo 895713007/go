@@ -39,7 +39,7 @@ c.BindTOML(mc)
 code equal to
 ```
 mc := &MyConfig{}
-b, _ := c.Get()
+b, _ := c.GetServiceConfig()
 
 json.Unmarshal(b, mc)
 // or
@@ -51,7 +51,7 @@ toml.Unmarshal(b, mc)
 
 ```
 //return raw value by key, return error if key not found
-//return error if request failed (http registry)
+//return error if request failed (http driver)
 value, err := c.Get("key")
 
 // shortcuts for single-value 
@@ -70,9 +70,9 @@ f := c.Float64Or("key", 2.345)
 
 ```
 
-### Registry
+### Driver
 
-support custom config registry, see [http_registry](https://github.com/mytokenio/go_sdk/blob/master/config/registry/http_registry.go) or [mock_registry](https://github.com/mytokenio/go_sdk/blob/master/config/registry/mock_registry.go)
+support custom config driver, see [http_driver](https://github.com/mytokenio/go_sdk/blob/master/config/driver/http_driver.go) or [mock_driver](https://github.com/mytokenio/go_sdk/blob/master/config/driver/mock_driver.go)
 
 ### TODO
 

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/mytokenio/go_sdk/config/registry"
+	"github.com/mytokenio/go_sdk/config/driver"
 	"github.com/mytokenio/go_sdk/log"
 	"encoding/json"
 	"errors"
@@ -10,24 +10,24 @@ import (
 
 type Config struct {
 	Service  string
-	Registry registry.Registry
+	Driver driver.Driver
 }
 
 func NewConfig(opts ...Option) *Config {
 	options := newOptions(opts...)
 
-	//use cache registry if ttl > 0
+	//use cache driver if ttl > 0
 	if options.TTL > 0 {
-		log.Infof("ttl %s, use cache registry", options.TTL.String())
-		cacheRegistry := registry.NewCacheRegistry(
-			registry.SubRegistry(options.Registry),
-			registry.TTL(options.TTL),
+		log.Infof("ttl %s, use cache driver", options.TTL.String())
+		cacheDriver := driver.NewCacheDriver(
+			driver.SubDriver(options.Driver),
+			driver.TTL(options.TTL),
 		)
-		options.Registry = cacheRegistry
+		options.Driver = cacheDriver
 	}
 	return &Config{
 		Service:  options.Service,
-		Registry: options.Registry,
+		Driver: options.Driver,
 	}
 }
 
@@ -70,9 +70,9 @@ func (c *Config) BindTOML(obj interface{}) {
 //======== shortcuts for single-value key ==============
 
 // return raw value by key, return error if key not found
-// return error if request failed (http registry)
+// return error if request failed (http driver)
 func (c *Config) Get(key string) ([]byte, error) {
-	b, err := c.Registry.Get(key)
+	b, err := c.Driver.Get(key)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (c *Config) Bool(name string) bool {
 }
 
 func (c *Config) BoolOr(name string, dv bool) bool {
-	s, err := c.Registry.Get(name)
+	s, err := c.Driver.Get(name)
 	if err != nil {
 		return dv
 	}

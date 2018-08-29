@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/mytokenio/go_sdk/config/registry"
+	"github.com/mytokenio/go_sdk/config/driver"
 	"time"
 )
 
@@ -9,13 +9,13 @@ type Option func(*Options)
 
 type Options struct {
 	Service string
-	TTL time.Duration  //use cache registry for ttl
-	Registry registry.Registry
+	TTL time.Duration  //use cache driver for ttl
+	Driver driver.Driver
 }
 
 func newOptions(opts ...Option) Options {
 	opt := Options{
-		Registry:  registry.DefaultRegistry,
+		Driver:  driver.DefaultDriver,
 		TTL: time.Second * 10,
 	}
 
@@ -31,9 +31,9 @@ func Service(service string) Option {
 	}
 }
 
-func Registry(r registry.Registry) Option {
+func Driver(r driver.Driver) Option {
 	return func(o *Options) {
-		o.Registry = r
+		o.Driver = r
 	}
 }
 

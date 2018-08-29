@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 	"runtime"
-	"github.com/mytokenio/go_sdk/config/registry"
+	"github.com/mytokenio/go_sdk/config/driver"
 	"strings"
 	"os"
 	"github.com/mytokenio/go_sdk/log"
@@ -41,14 +41,14 @@ func assert(t *testing.T, actual interface{}, expect interface{}) {
 }
 
 func newMockConfig() *Config {
-	r := registry.NewMockRegistry()
-	return NewConfig(Registry(r))
+	r := driver.NewMockDriver()
+	return NewConfig(Driver(r))
 }
 
 func TestService(t *testing.T) {
 	c := newMockConfig()
 	c.Service = "test.service.name"
-	c.Registry.Set(c.Service, []byte(MyConfigJson))
+	c.Driver.Set(c.Service, []byte(MyConfigJson))
 
 	b, _ := c.GetServiceConfig()
 	assert(t, string(b), MyConfigJson)
@@ -64,7 +64,7 @@ func TestBasic(t *testing.T) {
 	b, _ := c.Get("foo")
 	assert(t, string(b), "")
 
-	c.Registry.Set("foo", []byte("bar"))
+	c.Driver.Set("foo", []byte("bar"))
 	b2, _ := c.Get("foo")
 	assert(t, string(b2), "bar")
 }
@@ -73,11 +73,11 @@ func TestString(t *testing.T) {
 	c := newMockConfig()
 	assert(t, c.String("foo"), "")
 
-	c.Registry.Set("foo", []byte("bar"))
+	c.Driver.Set("foo", []byte("bar"))
 	assert(t, c.String("foo"), "bar")
 
-	c.Registry.Set("foo", []byte("xxx"))
-	log.Infof("registry name %s", c.Registry.String())
+	c.Driver.Set("foo", []byte("xxx"))
+	log.Infof("driver name %s", c.Driver.String())
 	assert(t, c.String("foo"), "xxx")
 
 	assert(t, c.String("not_exists"), "")
@@ -86,12 +86,12 @@ func TestString(t *testing.T) {
 
 func TestBool(t *testing.T) {
 	c := newMockConfig()
-	c.Registry.Set("foo", []byte("true"))
+	c.Driver.Set("foo", []byte("true"))
 
 	assert(t, c.Bool("foo"), true)
 	assert(t, c.BoolOr("foo", false), true)
 
-	c.Registry.Set("foo", []byte("False"))
+	c.Driver.Set("foo", []byte("False"))
 	assert(t, c.Bool("foo"), false)
 	assert(t, c.BoolOr("foo", true), false)
 
@@ -100,7 +100,7 @@ func TestBool(t *testing.T) {
 
 func TestInt(t *testing.T) {
 	c := newMockConfig()
-	c.Registry.Set("foo", []byte("123"))
+	c.Driver.Set("foo", []byte("123"))
 	assert(t, c.Int("foo"), 123)
 	assert(t, c.IntOr("foo", 222), 123)
 
@@ -114,11 +114,11 @@ func TestInt(t *testing.T) {
 
 func TestFloat(t *testing.T) {
 	c := newMockConfig()
-	c.Registry.Set("foo", []byte("123.456"))
+	c.Driver.Set("foo", []byte("123.456"))
 	assert(t, c.Float64("foo"), float64(123.456))
 	assert(t, c.Float64Or("xxx", 234.555), float64(234.555))
 
-	c.Registry.Set("foo", []byte("333"))
+	c.Driver.Set("foo", []byte("333"))
 	assert(t, c.Float64("foo"), float64(333))
 	assert(t, c.Float64Or("xxx", 234.555), float64(234.555))
 }

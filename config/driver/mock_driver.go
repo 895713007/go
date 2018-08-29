@@ -1,4 +1,4 @@
-package registry
+package driver
 
 import (
 	"sync"
@@ -6,18 +6,18 @@ import (
 	"fmt"
 )
 
-type mockRegistry struct {
+type mockDriver struct {
 	sync.RWMutex
 	KV  map[string][]byte
 }
 
-func NewMockRegistry() Registry {
-	return &mockRegistry{
+func NewMockDriver() Driver {
+	return &mockDriver{
 		KV:  map[string][]byte{},
 	}
 }
 
-func (c *mockRegistry) Get(key string) ([]byte, error) {
+func (c *mockDriver) Get(key string) ([]byte, error) {
 	c.RLock()
 	v, ok := c.KV[key]
 	c.RUnlock()
@@ -28,7 +28,7 @@ func (c *mockRegistry) Get(key string) ([]byte, error) {
 	return nil, fmt.Errorf("mock key %s not found", key)
 }
 
-func (c *mockRegistry) Set(key string, value []byte) error {
+func (c *mockDriver) Set(key string, value []byte) error {
 	c.Lock()
 	c.KV[key] = value
 	c.Unlock()
@@ -36,6 +36,6 @@ func (c *mockRegistry) Set(key string, value []byte) error {
 	return nil
 }
 
-func (c *mockRegistry) String() string {
+func (c *mockDriver) String() string {
 	return "mock"
 }
