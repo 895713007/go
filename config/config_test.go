@@ -50,7 +50,7 @@ func TestService(t *testing.T) {
 	c.Service = "test.service.name"
 	c.Registry.Set(c.Service, []byte(MyConfigJson))
 
-	b, _ := c.Get()
+	b, _ := c.GetServiceConfig()
 	assert(t, string(b), MyConfigJson)
 
 	mc := &MyConfig{}
@@ -61,11 +61,11 @@ func TestService(t *testing.T) {
 
 func TestBasic(t *testing.T) {
 	c := newMockConfig()
-	b, _ := c.GetKey("foo")
+	b, _ := c.Get("foo")
 	assert(t, string(b), "")
 
 	c.Registry.Set("foo", []byte("bar"))
-	b2, _ := c.GetKey("foo")
+	b2, _ := c.Get("foo")
 	assert(t, string(b2), "bar")
 }
 

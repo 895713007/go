@@ -34,16 +34,16 @@ func NewConfig(opts ...Option) *Config {
 //======== service config bind to struct =============
 
 // get by service name
-func (c *Config) Get() ([]byte, error) {
+func (c *Config) GetServiceConfig() ([]byte, error) {
 	if c.Service == "" {
 		return nil, errors.New("service name not set")
 	}
-	return c.GetKey(c.Service)
+	return c.Get(c.Service)
 }
 
 // bind service config to json struct
 func (c *Config) BindJSON(obj interface{}) {
-	b, err := c.Get()
+	b, err := c.GetServiceConfig()
 	if err != nil {
 		log.Errorf("service config error %s %s", c.Service, b)
 		return
@@ -56,7 +56,7 @@ func (c *Config) BindJSON(obj interface{}) {
 
 // bind service config to toml struct
 func (c *Config) BindTOML(obj interface{}) {
-	b, err := c.Get()
+	b, err := c.GetServiceConfig()
 	if err != nil {
 		log.Errorf("service config error %s %s", c.Service, b)
 		return
@@ -71,7 +71,7 @@ func (c *Config) BindTOML(obj interface{}) {
 
 // return raw value by key, return error if key not found
 // return error if request failed (http registry)
-func (c *Config) GetKey(key string) ([]byte, error) {
+func (c *Config) Get(key string) ([]byte, error) {
 	b, err := c.Registry.Get(key)
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func (c *Config) String(key string) string {
 
 // return string by name, or default value if not found.
 func (c *Config) StringOr(key string, dv string) string {
-	b, err := c.GetKey(key)
+	b, err := c.Get(key)
 	if err != nil {
 		return dv
 	}
@@ -112,7 +112,7 @@ func (c *Config) Int(name string) int {
 }
 
 func (c *Config) IntOr(name string, dv int) int {
-	b, err := c.GetKey(name)
+	b, err := c.Get(name)
 	if err != nil {
 		return dv
 	}
@@ -125,7 +125,7 @@ func (c *Config) Int64(name string) int64 {
 }
 
 func (c *Config) Int64Or(name string, dv int64) int64 {
-	b, err := c.GetKey(name)
+	b, err := c.Get(name)
 	if err != nil {
 		return dv
 	}
@@ -138,7 +138,7 @@ func (c *Config) Float64(name string) float64 {
 }
 
 func (c *Config) Float64Or(name string, dv float64) float64 {
-	b, err := c.GetKey(name)
+	b, err := c.Get(name)
 	if err != nil {
 		return dv
 	}

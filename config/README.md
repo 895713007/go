@@ -52,7 +52,7 @@ toml.Unmarshal(b, mc)
 ```
 //return raw value by key, return error if key not found
 //return error if request failed (http registry)
-value, err := c.GetKey("key")
+value, err := c.Get("key")
 
 // shortcuts for single-value 
 str := c.String("key")
