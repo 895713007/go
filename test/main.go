@@ -4,21 +4,32 @@ import (
 	"github.com/mytokenio/go_sdk/log"
 	"github.com/mytokenio/go_sdk/config"
 	"time"
-	"github.com/mytokenio/go_sdk/config/registry"
+	"github.com/mytokenio/go_sdk/config/driver"
+	"github.com/mytokenio/go_sdk/registry"
+	"google.golang.org/grpc/metadata"
+	"encoding/json"
 )
 
-const MyConfigJson = `
-{
-	"api": "http://api.mytokenapi.com",
-	"db": {
-		"host": "localhost",
-		"user": "root",
-		"password": "",
-		"name": "mytoken"
-	},
-	"log_servers": ["127.0.0.1:12333", "127.0.0.1:12334"]
+func main() {
+	testService()
 }
-`
+
+func testService() {
+	s := registry.Service{
+		Name:"test",
+		Metadata: metadata.Pairs("kk", "vv", "aa", "bb", "aa", "cc"),
+		Nodes: []registry.Node{
+			{"test", "127.0.0.1", 12345},
+		},
+	}
+	b, e := json.Marshal(s)
+	if e != nil {
+		log.Errorf("error %s", e)
+	} else {
+		log.Infof("service %s", b)
+	}
+}
+
 
 type MyConfig struct {
 	API string `json:"api"`
@@ -31,14 +42,26 @@ type MyConfig struct {
 	LogServers []string `json:"log_servers"`
 }
 
-func main() {
+func testConfig() {
+	myConfigJson := `
+{
+	"api": "http://api.mytokenapi.com",
+	"db": {
+		"host": "localhost",
+		"user": "root",
+		"password": "",
+		"name": "mytoken"
+	},
+	"log_servers": ["127.0.0.1:12333", "127.0.0.1:12334"]
+}
+`
 	log.Infof("hello")
 
 	mc := &MyConfig{}
 	c := config.NewConfig(
 		config.Service("mt.user"),
 		config.TTL(time.Second * 10),
-		config.Registry(registry.NewMockRegistry()),
+		config.Driver(driver.NewMockDriver()),
 	)
 
 	// config with http registry
@@ -49,21 +72,14 @@ func main() {
 	//	config.Registry(reg),
 	//)
 
-	c.Registry.Set(c.Service, []byte(MyConfigJson))
+	c.Driver.Set(c.Service, []byte(myConfigJson))
 	c.BindJSON(mc)
 
-	b, err := c.Get()
+	b, err := c.GetServiceConfig()
 	if err != nil {
 		log.Errorf(err.Error())
 		return
 	}
 	log.Infof("get key %s %s", c.Service, b)
 	log.Infof("MyConfig %v", mc)
-}
-
-func httpRegistry() {
-
-	mc := &MyConfig{}
-
-
 }
