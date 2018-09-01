@@ -8,8 +8,11 @@ import package
 import (
     "github.com/mytokenio/go_sdk/config"
 )
-
 ```
+
+set env for http driver
+
+`CONFIG_SERVER`  `http://xxx.com` 
 
 #### Service
 
@@ -26,7 +29,17 @@ type MyConfig struct {...}
 
 set service name by `config.Service`
 ```
-c := config.NewConfig(config.Service("mt.user"))
+// config with http driver
+c := config.NewConfig(
+    config.Service("mt.user"),
+    config.TTL(time.Second * 10), //cache ttl
+    config.Driver(
+        driver.NewHttpDriver(
+            driver.Host("http://xxx.com"),
+            driver.Timeout(time.Second * 3),
+        ),
+    ),
+)
 ```
 
 ```

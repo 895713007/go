@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"encoding/json"
+	"os"
 )
 
 type httpDriver struct {
@@ -39,6 +40,10 @@ func NewHttpDriver(opts ...Option) Driver {
 	timeout := time.Second * 3
 	if options.Timeout > 0 {
 		timeout = options.Timeout
+	}
+
+	if options.Host == "" {
+		options.Host = os.Getenv("CONFIG_SERVER")
 	}
 
 	return &httpDriver{

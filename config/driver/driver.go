@@ -18,6 +18,7 @@ type Option func(*Options)
 
 type Options struct {
 	Host string     //for http driver
+	Path string     //for file driver
 	Timeout time.Duration
 	SubDriver Driver //for cache driver
 	TTL time.Duration
@@ -26,6 +27,12 @@ type Options struct {
 func Host(host string) Option {
 	return func(o *Options) {
 		o.Host = host
+	}
+}
+
+func Path(path string) Option {
+	return func(o *Options) {
+		o.Path = path
 	}
 }
 

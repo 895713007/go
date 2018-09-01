@@ -6,11 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/BurntSushi/toml"
+	"fmt"
+	"time"
 )
 
 type Config struct {
-	Service  string
-	Driver driver.Driver
+	Service string
+	Tags    []string
+	Driver  driver.Driver
+	OnChanged []func(*Config) error
 }
 
 func NewConfig(opts ...Option) *Config {
@@ -25,9 +29,39 @@ func NewConfig(opts ...Option) *Config {
 		)
 		options.Driver = cacheDriver
 	}
-	return &Config{
-		Service:  options.Service,
-		Driver: options.Driver,
+	c := &Config{
+		Service: options.Service,
+		Tags: options.Tags,
+		Driver:  options.Driver,
+		OnChanged: options.OnChanged,
+	}
+	go c.monitor()
+	return c
+}
+
+//loop monitor if config changed ?
+func (c *Config) monitor() {
+	doOnChanged := func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Errorf("OnChanged callback panic %v", r)
+			}
+		}()
+
+		for _, fn := range c.OnChanged {
+			if err := fn(c); err != nil {
+				log.Errorf("OnChanged callback error %s", err)
+			}
+		}
+	}
+
+	ticker := time.NewTicker(time.Second * 5)
+	for {
+		select {
+			case <- ticker.C:
+				log.Infof("monitoring ...")
+				doOnChanged()
+		}
 	}
 }
 
@@ -42,108 +76,29 @@ func (c *Config) GetServiceConfig() ([]byte, error) {
 }
 
 // bind service config to json struct
-func (c *Config) BindJSON(obj interface{}) {
+func (c *Config) BindJSON(obj interface{}) error {
 	b, err := c.GetServiceConfig()
 	if err != nil {
-		log.Errorf("service config error %s %s", c.Service, b)
-		return
+		log.Errorf("service config error %s %s %s", c.Service, b, err)
+		return err
 	}
 	e := json.Unmarshal(b, obj)
 	if e != nil {
-		log.Errorf("json unmarshal error %s", e)
+		return fmt.Errorf("json unmarshal error %s", e)
 	}
+	return nil
 }
 
 // bind service config to toml struct
-func (c *Config) BindTOML(obj interface{}) {
+func (c *Config) BindTOML(obj interface{}) error {
 	b, err := c.GetServiceConfig()
 	if err != nil {
-		log.Errorf("service config error %s %s", c.Service, b)
-		return
+		log.Errorf("service config error %s %s %s", c.Service, b, err)
+		return err
 	}
 	e := toml.Unmarshal(b, obj)
 	if e != nil {
-		log.Errorf("toml unmarshal error %s", e)
+		return fmt.Errorf("toml unmarshal error %s", e)
 	}
+	return nil
 }
-
-//======== shortcuts for single-value key ==============
-
-// return raw value by key, return error if key not found
-// return error if request failed (http driver)
-func (c *Config) Get(key string) ([]byte, error) {
-	b, err := c.Driver.Get(key)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
-// return string
-func (c *Config) String(key string) string {
-	return c.StringOr(key, "")
-}
-
-// return string by name, or default value if not found.
-func (c *Config) StringOr(key string, dv string) string {
-	b, err := c.Get(key)
-	if err != nil {
-		return dv
-	}
-
-	return toString(b, "")
-}
-
-func (c *Config) Bool(name string) bool {
-	return c.BoolOr(name, false)
-}
-
-func (c *Config) BoolOr(name string, dv bool) bool {
-	s, err := c.Driver.Get(name)
-	if err != nil {
-		return dv
-	}
-
-	return toBool(s, dv)
-}
-
-func (c *Config) Int(name string) int {
-	return c.IntOr(name, 0)
-}
-
-func (c *Config) IntOr(name string, dv int) int {
-	b, err := c.Get(name)
-	if err != nil {
-		return dv
-	}
-
-	return toInt(b, dv)
-}
-
-func (c *Config) Int64(name string) int64 {
-	return c.Int64Or(name, 0)
-}
-
-func (c *Config) Int64Or(name string, dv int64) int64 {
-	b, err := c.Get(name)
-	if err != nil {
-		return dv
-	}
-
-	return toInt64(b, dv)
-}
-
-func (c *Config) Float64(name string) float64 {
-	return c.Float64Or(name, 0)
-}
-
-func (c *Config) Float64Or(name string, dv float64) float64 {
-	b, err := c.Get(name)
-	if err != nil {
-		return dv
-	}
-
-	return toFloat64(b, dv)
-}
-
-//TODO, more types

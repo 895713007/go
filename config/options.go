@@ -8,15 +8,17 @@ import (
 type Option func(*Options)
 
 type Options struct {
-	Service string
-	TTL time.Duration  //use cache driver for ttl
-	Driver driver.Driver
+	Service   string
+	Tags      []string
+	TTL       time.Duration //use cache driver for ttl
+	Driver    driver.Driver
+	OnChanged []func(*Config) error
 }
 
 func newOptions(opts ...Option) Options {
 	opt := Options{
-		Driver:  driver.DefaultDriver,
-		TTL: time.Second * 10,
+		Driver: driver.DefaultDriver,
+		TTL:    time.Second * 10,
 	}
 
 	for _, o := range opts {
@@ -31,6 +33,12 @@ func Service(service string) Option {
 	}
 }
 
+func Tags(tags []string) Option {
+	return func(o *Options) {
+		o.Tags = tags
+	}
+}
+
 func Driver(r driver.Driver) Option {
 	return func(o *Options) {
 		o.Driver = r
@@ -40,5 +48,11 @@ func Driver(r driver.Driver) Option {
 func TTL(t time.Duration) Option {
 	return func(o *Options) {
 		o.TTL = t
+	}
+}
+
+func OnChanged(fn func(c *Config) error) Option {
+	return func(o *Options) {
+		o.OnChanged = append(o.OnChanged, fn)
 	}
 }
