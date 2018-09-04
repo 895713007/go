@@ -87,6 +87,15 @@ c.BindTOML(...)
 c.Watch(...)
 ```
 
+### UI (for http driver)
+
+```
+cd ui/
+go build .
+./ui
+```
+open `http://127.0.0.1:5556`
+
 ### Other
 
 TODO

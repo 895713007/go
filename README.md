@@ -32,13 +32,17 @@ import (
 )
 
 mc := &MyConfig{}
+c := config.NewConfig()
 
-c := config.NewConfig(config.Service("mt.user"))
-c.BindJSON(mc)
-// or
+// bind to struct
 c.BindTOML(mc)
 
-// or custom unmarshal 
+// or, watch change
+c.Watch(func(c *config.Config) error {
+    err := c.BindTOML(mc)
+    // TODO
+    return nil
+})
 ```
 
 [more detail](https://github.com/mytokenio/go_sdk/tree/master/config)
@@ -47,6 +51,8 @@ c.BindTOML(mc)
 ## TODO
 
 service registry/broker/health
+
+metrics
 
 rpc server/client/protocol
 
