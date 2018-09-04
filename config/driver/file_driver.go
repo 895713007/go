@@ -4,6 +4,8 @@ import (
 	"os"
 	"io/ioutil"
 	"errors"
+	"path/filepath"
+	"strings"
 )
 
 type fileDriver struct {
@@ -21,7 +23,12 @@ func NewFileDriver(opts ...Option) Driver {
 	}
 }
 
-func (d *fileDriver) Get(key string) ([]byte, error) {
+func (d *fileDriver) List() ([]*Value, error) {
+	var vals []*Value
+	return vals, nil
+}
+
+func (d *fileDriver) Get(key string) (*Value, error) {
 	path := key
 	if d.path != "" {
 		path = d.path
@@ -37,14 +44,18 @@ func (d *fileDriver) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 
-	//info, err := fh.Stat()
-	//if err != nil {
-	//	return nil, err
-	//}
-	return b, nil
+	info, err := fh.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	v := NewValue(key, b)
+	v.Timestamp = info.ModTime().Unix()
+	v.Format = strings.TrimLeft(filepath.Ext(path), ".")
+	return v, nil
 }
 
-func (d *fileDriver) Set(key string, value []byte) error {
+func (d *fileDriver) Set(value *Value) error {
 	return errors.New("TODO")
 }
 

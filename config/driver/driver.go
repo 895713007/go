@@ -5,20 +5,21 @@ import (
 )
 
 type Driver interface {
-	Get(string) ([]byte, error)
-	Set(string, []byte) error
+	List() ([]*Value, error)
+	Get(string) (*Value, error)
+	Set(*Value) error
 	String() string
 }
 
 var (
-	DefaultDriver = NewHttpDriver()
+	DefaultDriver = NewFileDriver(Path("./config.toml"))
 )
 
 type Option func(*Options)
 
 type Options struct {
-	Host string     //for http driver
 	Path string     //for file driver
+	Host string     //for http driver
 	Timeout time.Duration
 	SubDriver Driver //for cache driver
 	TTL time.Duration

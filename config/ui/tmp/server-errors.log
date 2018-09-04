@@ -1,0 +1,128 @@
+stderr: # command-line-arguments
+./pages.go:20:18: undefined: pagePostEdit
+, cmd err: exit status 2stderr: # command-line-arguments
+./ui.go:7:2: imported and not used: "github.com/gin-gonic/gin"
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:13:17: undefined: pongo2
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:13:17: undefined: pongo2
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:12:17: undefined: pongo2gin
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:12:17: undefined: pongo2gin
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:12:17: undefined: pongo2gin
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:12:17: undefined: pongo2gin
+, cmd err: exit status 2stderr: # github.com/mytokenio/go_sdk/config/ui/pongin
+pongin/pongo.go:59:2: syntax error: unexpected }, expecting expression
+pongin/pongo.go:68:32: syntax error: unexpected http, expecting comma or )
+, cmd err: exit status 2stderr: # github.com/mytokenio/go_sdk/config/ui/pongin
+pongin/pongo.go:59:10: syntax error: unexpected map, expecting :
+, cmd err: exit status 2stderr: # github.com/mytokenio/go_sdk/config/ui/pongin
+pongin/pongo.go:59:10: syntax error: unexpected :=, expecting :
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:35:2: undefined: c
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:35:2: undefined: c
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:35:2: undefined: c
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:24:13: undefined: pageIndex
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/flosch/pongo2"
+./pages.go:51:38: undefined: H
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:15:2: missing value in const declaration
+./pages.go:15:9: syntax error: unexpected :=, expecting semicolon or newline or )
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:22:18: syntax error: unexpected newline, expecting comma or )
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+./pages.go:89:38: undefined: string1
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+./pages.go:90:38: undefined: string1
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+./pages.go:90:38: undefined: string1
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+./pages.go:91:38: undefined: string1
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+./pages.go:98:38: undefined: string1
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:7:2: imported and not used: "github.com/mytokenio/go_sdk/config"
+, cmd err: exit status 2stderr: # github.com/mytokenio/go_sdk/config/driver
+../driver/http_driver.go:82:43: undefined: key
+../driver/http_driver.go:85:3: too many arguments to return
+	have (nil, error)
+	want (error)
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:9:2: imported and not used: "time"
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:66:29: undefined: key
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:66:29: undefined: key
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:66:29: undefined: key
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:66:29: undefined: key
+, cmd err: exit status 2stderr: # github.com/mytokenio/go_sdk/config/ui/pongin
+pongin/pongin.go:65:8: cannot use data (type interface {}) as type pongo2.Context in assignment: need type assertion
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:11:8: syntax error: unexpected newline in type declaration
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:60:18: syntax error: unexpected {, expecting semicolon or newline
+./pages.go:61:2: syntax error: unexpected }, expecting expression
+./pages.go:67:6: syntax error: unexpected pageAdd, expecting (
+./pages.go:74:6: syntax error: unexpected pageEdit, expecting (
+./pages.go:88:6: syntax error: unexpected pagePostEdit, expecting (
+./pages.go:109:6: syntax error: unexpected pageIndex, expecting (
+./pages.go:113:6: syntax error: unexpected pageError, expecting (
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:59:2: i declared and not used
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:146:18: flashMsg("ddd") used as value
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:15:15: syntax error: unexpected newline in type declaration
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:30:12: undefined: FlashError
+./pages.go:31:10: undefined: FlashMsg
+./pages.go:137:10: undefined: flashBag
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:146:12: undefined: flashBag
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:144:2: undefined: session
+./pages.go:144:23: undefined: count
+./pages.go:145:2: undefined: session
+./pages.go:149:12: undefined: flashBag
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:143:19: session.G undefined (type "github.com/gin-gonic/contrib/sessions".Session has no field or method G)
+./pages.go:149:2: undefined: session
+./pages.go:149:23: undefined: count
+./pages.go:150:2: undefined: session
+./pages.go:154:12: undefined: flashBag
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:136:12: undefined: flashBag
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:10:2: imported and not used: "time"
+./pages.go:137:12: undefined: flashBag
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:137:12: undefined: flashBag
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:18:2: too many arguments to return
+	have (string)
+	want ()
+, cmd err: exit status 2stderr: # command-line-arguments
+./pages.go:9:2: imported and not used: "fmt"
+, cmd err: exit status 2

@@ -4,23 +4,28 @@ import (
 	"sync"
 	"github.com/mytokenio/go_sdk/log"
 	"fmt"
+	"errors"
 )
 
 type mockDriver struct {
 	sync.RWMutex
-	KV  map[string][]byte
+	KV  map[string]*Value
 }
 
 func NewMockDriver() Driver {
 	return &mockDriver{
-		KV:  map[string][]byte{},
+		KV:  map[string]*Value{},
 	}
 }
 
-func (c *mockDriver) Get(key string) ([]byte, error) {
-	c.RLock()
-	v, ok := c.KV[key]
-	c.RUnlock()
+func (d *mockDriver) List() ([]*Value, error) {
+	return nil, errors.New("TODO")
+}
+
+func (d *mockDriver) Get(key string) (*Value, error) {
+	d.RLock()
+	v, ok := d.KV[key]
+	d.RUnlock()
 
 	if ok {
 		return v, nil
@@ -28,14 +33,14 @@ func (c *mockDriver) Get(key string) ([]byte, error) {
 	return nil, fmt.Errorf("mock key %s not found", key)
 }
 
-func (c *mockDriver) Set(key string, value []byte) error {
-	c.Lock()
-	c.KV[key] = value
-	c.Unlock()
-	log.Infof("mock set %s %s", key, value)
+func (d *mockDriver) Set(value *Value) error {
+	d.Lock()
+	d.KV[value.K] = value
+	d.Unlock()
+	log.Infof("mock set %s %s", value.K, value)
 	return nil
 }
 
-func (c *mockDriver) String() string {
+func (d *mockDriver) String() string {
 	return "mock"
 }

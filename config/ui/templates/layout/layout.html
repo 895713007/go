@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>配置管理中心</title>
+
+    <meta name="description" content="overview &amp; stats"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.custom.min.css"/>
+    <link rel="stylesheet" href="/static/css/ace.min.css"/>
+    <link rel="stylesheet" href="/static/css/ace-responsive.min.css"/>
+    <link rel="stylesheet" href="https://fonts.proxy.ustclug.org/css?family=Open+Sans:400,300"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+
+<body class="navbar-fixed breadcrumbs-fixed">
+
+<div class="navbar fixed navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a href="" class="brand">
+                <small>
+                    <i class="icon-leaf"></i>
+                    MyToken 配置管理中心
+                </small>
+            </a><!--/.brand-->
+
+            <ul class="nav ace-nav pull-right">
+                <li class="light-blue">
+                    <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <span class="user-info">
+                            <small>Welcome,</small> xx
+                        </span>
+
+                        <i class="icon-caret-down"></i>
+                    </a>
+
+                    <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-closer">
+                        <li>
+                            <a href="">
+                                <i class="icon-cog"></i>
+                                设置
+                            </a>
+                        </li>
+
+                        <li class="divider"></li>
+
+                        <li>
+                            <a href="">
+                                <i class="icon-off"></i>
+                                退出
+                            </a>
+                        </li>
+                    </ul>
+
+                </li>
+            </ul><!--/.ace-nav-->
+        </div><!--/.container-fluid-->
+    </div><!--/.navbar-inner-->
+</div>
+
+<div class="main-container container-fluid">
+    <a class="menu-toggler" id="menu-toggler" href="#">
+        <span class="menu-text"></span>
+    </a>
+
+    <div class="sidebar fixed" id="sidebar">
+        {% include "sidebar.html" %}
+
+        <div class="sidebar-collapse" id="sidebar-collapse">
+            <i class="icon-double-angle-left"></i>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="breadcrumbs fixed" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="icon-home home-icon"></i>
+                    <a href="">控制面板</a>
+                    <span class="divider">
+                <i class="icon-angle-right arrow-icon"></i>
+            </span>
+                </li>
+                {% block breadcrumb %}
+                <li class="active">控制面板</li>
+                {% endblock %}
+            </ul><!--.breadcrumb-->
+
+
+        </div>
+
+        <div class="page-content">
+
+            {% set error_msg = error.String() %}
+            {% if error_msg %}
+            <div class="alert alert-block alert-error">
+                <button type="button" class="close" data-dismiss="alert">
+                    <i class="icon-remove"></i>
+                </button>
+                <i class="icon-remove"></i>
+                {{ error_msg }}
+            </div>
+            {% endif %}
+
+            {% set succ_msg = msg.String() %}
+            {% if succ_msg %}
+            <div class="alert alert-block alert-success">
+                <button type="button" class="close" data-dismiss="alert">
+                    <i class="icon-remove"></i>
+                </button>
+                <i class="icon-ok green"></i>
+                {{ succ_msg }}
+            </div>
+            {% endif %}
+
+            {% block page_content %}
+            {% endblock %}
+        </div><!--/.page-content-->
+
+    </div><!--/.main-content-->
+</div><!--/.main-container-->
+
+<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-small btn-inverse">
+    <i class="icon-double-angle-up icon-only bigger-110"></i>
+</a>
+
+
+<script src="/static/js/jquery-2.0.3.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+
+
+<script src="/static/js/ace-elements.min.js"></script>
+<script src="/static/js/ace.min.js"></script>
+
+
+<!--inline scripts related to this page-->
+{% block js %}
+
+{% endblock %}
+</body>
+</html>

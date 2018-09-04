@@ -3,19 +3,24 @@ package config
 import (
 	"github.com/mytokenio/go_sdk/config/driver"
 	"github.com/mytokenio/go_sdk/log"
-	"encoding/json"
-	"errors"
-	"github.com/BurntSushi/toml"
-	"fmt"
 	"time"
+	"runtime/debug"
+)
+
+const (
+	DefaultWatchInterval = 5 * time.Second
+	DefaultServicePrefix = "mt.service."
 )
 
 type Config struct {
-	Service string
-	Tags    []string
-	Driver  driver.Driver
-	OnChanged []func(*Config) error
+	Service  string
+	Tags     []string
+	Driver   driver.Driver
+	OnChange OnChangeFn
+	checkSum string
 }
+
+type OnChangeFn func(*Config) error
 
 func NewConfig(opts ...Option) *Config {
 	options := newOptions(opts...)
@@ -31,74 +36,140 @@ func NewConfig(opts ...Option) *Config {
 	}
 	c := &Config{
 		Service: options.Service,
-		Tags: options.Tags,
+		Tags:    options.Tags,
 		Driver:  options.Driver,
-		OnChanged: options.OnChanged,
 	}
-	go c.monitor()
 	return c
 }
 
+func NewFileConfig(path string) *Config {
+	return NewConfig(
+		Driver(driver.NewFileDriver(driver.Path(path))),
+	)
+}
+
+func NewHttpConfig(service string, driverOpts ... driver.Option) *Config {
+	httpDriver := driver.NewHttpDriver(driverOpts...)
+
+	return NewConfig(
+		Service(service),
+		Driver(httpDriver),
+	)
+}
+
 //loop monitor if config changed ?
-func (c *Config) monitor() {
-	doOnChanged := func() {
-		defer func() {
-			if r := recover(); r != nil {
-				log.Errorf("OnChanged callback panic %v", r)
-			}
-		}()
+func (c *Config) Watch(fn OnChangeFn, duration ... time.Duration) {
+	c.OnChange = fn
+	c.doOnChange()
 
-		for _, fn := range c.OnChanged {
-			if err := fn(c); err != nil {
-				log.Errorf("OnChanged callback error %s", err)
+	interval := DefaultWatchInterval
+	if len(duration) > 0 {
+		interval = duration[0]
+	}
+	ticker := time.NewTicker(interval)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				log.Infof("watching...")
+				c.watchChange()
 			}
 		}
-	}
+	}()
+}
 
-	ticker := time.NewTicker(time.Second * 5)
-	for {
-		select {
-			case <- ticker.C:
-				log.Infof("monitoring ...")
-				doOnChanged()
+func (c *Config) watchChange() {
+	v, err := c.GetServiceConfig()
+	if err != nil {
+		log.Errorf("error get config %s", err)
+	}
+	log.Infof("watchChange %s %s", v.CheckSum, c.checkSum)
+	if v.CheckSum != c.checkSum {
+		err = c.doOnChange()
+		if err == nil {
+			c.checkSum = v.CheckSum
 		}
 	}
+}
+
+func (c *Config) doOnChange() error {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorf("OnChange callback panic %v %s", r, debug.Stack())
+		}
+	}()
+
+	log.Infof("onchange fn %v+", c.OnChange)
+
+	if err := c.OnChange(c); err != nil {
+		log.Errorf("OnChange callback error %s", err)
+		return err
+	}
+	return nil
 }
 
 //======== service config bind to struct =============
 
 // get by service name
-func (c *Config) GetServiceConfig() ([]byte, error) {
-	if c.Service == "" {
-		return nil, errors.New("service name not set")
+func (c *Config) GetServiceConfig() (*driver.Value, error) {
+	value, err := c.Get(c.genServiceKey())
+	if c.checkSum == "" {
+		c.checkSum = value.CheckSum
 	}
-	return c.Get(c.Service)
+	return value, err
+}
+
+//TODO 命名规则目前仅用于 service, 先写死前缀，后续改进
+func (c *Config) genServiceKey() string {
+	return DefaultServicePrefix + c.Service
+}
+
+// bind via config value format
+func (c *Config) Bind(obj interface{}) error {
+	v, err := c.GetServiceConfig()
+	if err != nil {
+		log.Errorf("service config error %s %s %s", c.Service, v, err)
+		return err
+	}
+	return v.Bind(obj)
 }
 
 // bind service config to json struct
 func (c *Config) BindJSON(obj interface{}) error {
-	b, err := c.GetServiceConfig()
+	v, err := c.GetServiceConfig()
 	if err != nil {
-		log.Errorf("service config error %s %s %s", c.Service, b, err)
+		log.Errorf("service config error %s %s %s", c.Service, v, err)
 		return err
 	}
-	e := json.Unmarshal(b, obj)
-	if e != nil {
-		return fmt.Errorf("json unmarshal error %s", e)
-	}
-	return nil
+	return v.BindJSON(obj)
 }
 
 // bind service config to toml struct
 func (c *Config) BindTOML(obj interface{}) error {
-	b, err := c.GetServiceConfig()
+	v, err := c.GetServiceConfig()
 	if err != nil {
-		log.Errorf("service config error %s %s %s", c.Service, b, err)
+		log.Errorf("service config error %s %s %s", c.Service, v, err)
 		return err
 	}
-	e := toml.Unmarshal(b, obj)
-	if e != nil {
-		return fmt.Errorf("toml unmarshal error %s", e)
+	return v.BindTOML(obj)
+}
+
+// bind service config to yaml struct
+func (c *Config) BindYAML(obj interface{}) error {
+	v, err := c.GetServiceConfig()
+	if err != nil {
+		log.Errorf("service config error %s %s %s", c.Service, v, err)
+		return err
 	}
-	return nil
+	return v.BindYAML(obj)
+}
+
+// return raw value by key, return error if key not found
+// return error if request failed (http driver)
+func (c *Config) Get(key string) (*driver.Value, error) {
+	v, err := c.Driver.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	return v, nil
 }

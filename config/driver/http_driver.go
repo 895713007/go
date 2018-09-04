@@ -18,6 +18,13 @@ type httpDriver struct {
 	sync.Mutex
 }
 
+type Request struct {
+	Key       string `json:"key"`
+	Value     string `json:"value"`
+	Comment   string `json:"comment"`
+	CreatedBy string `json:"created_by"`
+}
+
 type Response struct {
 	Code      int    `json:"code"`
 	Message   string `json:"message"`
@@ -26,8 +33,9 @@ type Response struct {
 		Key       string `json:"key"`
 		Value     string `json:"value"`
 		Comment   string `json:"comment"`
-		CreatedAt string `json:"created_at"`
-		UpdatedAt string `json:"updated_at"`
+		UpdatedBy string `json:"updated_by"`
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
 	}
 }
 
@@ -52,7 +60,12 @@ func NewHttpDriver(opts ...Option) Driver {
 	}
 }
 
-func (c *httpDriver) Get(key string) ([]byte, error) {
+func (d *httpDriver) List() ([]*Value, error) {
+	var vals []*Value
+	return vals, nil
+}
+
+func (c *httpDriver) Get(key string) (*Value, error) {
 	uri := fmt.Sprintf("/v1/config/item/%s", key)
 	b, err := c.request("GET", uri, nil)
 	if err != nil {
@@ -61,11 +74,41 @@ func (c *httpDriver) Get(key string) ([]byte, error) {
 
 	rsp := &Response{}
 	json.Unmarshal(b, rsp)
-	return []byte(rsp.Data.Value), nil
+	if rsp.Code != 0 {
+		return nil, fmt.Errorf("get error %s", rsp.Message)
+	}
+
+	v := &Value{
+		K: key,
+		V: b,
+		Timestamp: rsp.Data.UpdatedAt.Unix(),
+		Format: "json",
+		Metadata: map[string]string{},
+	}
+	return v, nil
 }
 
-func (c *httpDriver) Set(name string, value []byte) error {
-	return errors.New("todo")
+func (c *httpDriver) Set(value *Value) error {
+	uri := "/v1/config/item"
+	req := Request{
+		Key: value.K,
+		Value: value.String(),
+		Comment: "",
+		CreatedBy: "sdk",
+	}
+	reqBytes, _ := json.Marshal(req)
+	b, err := c.request("POST", uri, reqBytes)
+	if err != nil {
+		return fmt.Errorf("post failed %s", err)
+	}
+
+	rsp := &Response{}
+	json.Unmarshal(b, rsp)
+	if rsp.Code != 0 {
+		return fmt.Errorf("response error %s", rsp.Message)
+	}
+
+	return nil
 }
 
 func (c *httpDriver) request(method string, path string, data []byte) ([]byte, error) {

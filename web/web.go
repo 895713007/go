@@ -175,7 +175,7 @@ func (s *service) start() error {
 		ch <- l.Close()
 	}()
 
-	log.Infof("listening on %v\n", l.Addr().String())
+	log.Infof("listening on %v", l.Addr().String())
 	return nil
 }
 

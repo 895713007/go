@@ -14,11 +14,7 @@ set env for http driver
 
 `CONFIG_SERVER`  `http://xxx.com` 
 
-#### Service
-
-shortcut for:
-1. get config raw value by service name
-2. bind raw bytes to custom struct via json or toml
+#### Service Config
 
 custom struct 
 
@@ -31,7 +27,7 @@ set service name by `config.Service`
 ```
 // config with http driver
 c := config.NewConfig(
-    config.Service("mt.user"),
+    config.Service("user"),
     config.TTL(time.Second * 10), //cache ttl
     config.Driver(
         driver.NewHttpDriver(
@@ -60,31 +56,39 @@ toml.Unmarshal(b, mc)
 ```
 
 
-#### Get Raw Value by Key
+### Watch Change
 
+default watch interval 5 seconds,
 ```
-//return raw value by key, return error if key not found
-//return error if request failed (http driver)
-value, err := c.Get("key")
+c.Watch(func(c *config.Config) error {
+    err := c.BindTOML(mc)
+    if err != nil {
+        log.Errorf("config bind error %s", err)
+        return err
+    }
 
-// shortcuts for single-value 
-str := c.String("key")
-b := c.Bool("key")
-i := c.Int("key")
-i64 := c.Int64("key")
-f := c.Float64("key")
-
-// default value, if key not exists or request failed
-str := c.StringOr("key", "default value")
-b := c.BoolOr("key", true)
-i := c.IntOr("key", 1234)
-i64 := c.Int64Or("key", 43124321)
-f := c.Float64Or("key", 2.345)
-
+    log.Infof("service config changed %v", mc)
+    return nil
+})
 ```
 
-### Driver
+you can pass second parameter to control interval
 
-support custom config driver, see [http_driver](https://github.com/mytokenio/go_sdk/blob/master/config/driver/http_driver.go) or [mock_driver](https://github.com/mytokenio/go_sdk/blob/master/config/driver/mock_driver.go)
+`c.Watch(callback, 10 * time.Second)`
+
+
+### File Driver
+
+the default config driver, default file name `config.toml`
+```
+c := config.NewConfig()
+c.BindTOML(...)
+// or
+c.Watch(...)
+```
+
+### Other
+
+TODO
 
 

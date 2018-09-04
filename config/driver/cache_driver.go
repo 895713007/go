@@ -4,19 +4,21 @@ import (
 	"sync"
 	"time"
 	"github.com/mytokenio/go_sdk/log"
+	"errors"
 )
 
-type Value struct {
+//for TTL check
+type cacheValue struct {
 	K         string
-	V         []byte
+	V         *Value
 	Timestamp int64
 }
 
 type cacheDriver struct {
 	sync.RWMutex
 	SubDriver Driver
-	TTL         time.Duration
-	Data        map[string]Value
+	TTL       time.Duration
+	Data      map[string]cacheValue
 }
 
 func NewCacheDriver(opts ...Option) Driver {
@@ -40,48 +42,52 @@ func NewCacheDriver(opts ...Option) Driver {
 	}
 	log.Infof("cache sub driver %s", options.SubDriver.String())
 	return &cacheDriver{
-		TTL:         minTTL,
+		TTL:       minTTL,
 		SubDriver: options.SubDriver,
-		Data: map[string]Value{},
+		Data:      map[string]cacheValue{},
 	}
 }
 
-func (c *cacheDriver) Get(key string) ([]byte, error) {
-	if cache := c.cacheGet(key); cache != nil {
+func (d *cacheDriver) List() ([]*Value, error) {
+	return nil, errors.New("TODO")
+}
+
+func (d *cacheDriver) Get(key string) (*Value, error) {
+	if cache := d.cacheGet(key); cache != nil {
 		return cache, nil
 	}
 
-	b, err := c.SubDriver.Get(key)
+	v, err := d.SubDriver.Get(key)
 	if err != nil {
 		return nil, err
 	}
 
-	c.cacheSet(key, b)
+	d.cacheSet(v)
 
-	return b, nil
+	return v, nil
 }
 
-func (c *cacheDriver) Set(key string, value []byte) error {
-	c.Lock()
-	delete(c.Data, key)
-	c.Unlock()
+func (d *cacheDriver) Set(value *Value) error {
+	d.Lock()
+	delete(d.Data, value.K)
+	d.Unlock()
 
-	return c.SubDriver.Set(key, value)
+	return d.SubDriver.Set(value)
 }
 
-func (c *cacheDriver) cacheGet(key string) []byte {
-	c.RLock()
-	v, ok := c.Data[key]
-	c.RUnlock()
+func (d *cacheDriver) cacheGet(key string) *Value {
+	d.RLock()
+	v, ok := d.Data[key]
+	d.RUnlock()
 
 	if !ok {
 		return nil
 	}
 	//expired ?
-	if v.Timestamp + int64(c.TTL.Seconds()) < time.Now().Unix() {
-		c.Lock()
-		delete(c.Data, key)
-		c.Unlock()
+	if v.Timestamp+int64(d.TTL.Seconds()) < time.Now().Unix() {
+		d.Lock()
+		delete(d.Data, key)
+		d.Unlock()
 
 		return nil
 	}
@@ -89,18 +95,18 @@ func (c *cacheDriver) cacheGet(key string) []byte {
 	return v.V
 }
 
-func (c *cacheDriver) cacheSet(key string, value []byte) error {
-	c.Lock()
-	defer c.Unlock()
+func (d *cacheDriver) cacheSet(value *Value) error {
+	d.Lock()
+	defer d.Unlock()
 
-	c.Data[key] = Value{
-		K: key,
-		V: value,
+	d.Data[value.K] = cacheValue{
+		K:         value.K,
+		V:         value,
 		Timestamp: time.Now().Unix(),
 	}
 	return nil
 }
 
-func (c *cacheDriver) String() string {
+func (d *cacheDriver) String() string {
 	return "cache"
 }
