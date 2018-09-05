@@ -10,14 +10,15 @@ import (
 )
 
 type H = pongo2.Context
+
 var d driver.Driver
 
 func init() {
-	//d = driver.NewHttpDriver(
-	//	driver.Host("http://xxx.com"),
-	//	driver.Timeout(time.Second * 10),
-	//)
-	d = driver.NewMockDriver()
+	if driver.ConfigServer != "" {
+		d = driver.NewHttpDriver()
+	} else {
+		d = driver.NewFileDriver()
+	}
 }
 
 func getHandler() *gin.Engine {
@@ -56,17 +57,18 @@ func pageList(c *gin.Context) {
 	if err != nil {
 		//pageError(c, err.Error())
 		//return
+
+		flashMsg("demo list")
+		demos := []string{"user", "message_center", "test"}
+
+		for _, s := range demos {
+			vals = append(vals, &driver.Value{
+				K: config.DefaultServicePrefix + s,
+				V: []byte("test"),
+			})
+		}
 	}
 
-	flashMsg("demo list")
-	demos := []string{"user", "message_center", "test"}
-
-	for _, s := range demos {
-		vals = append(vals, &driver.Value{
-			K: config.DefaultServicePrefix + s,
-			V: []byte("test"),
-		})
-	}
 	c.HTML(http.StatusOK, "list.html", H{
 		"vals": vals,
 	})
@@ -123,4 +125,3 @@ func pageError(c *gin.Context, error string) {
 	fError.Value = error
 	c.HTML(http.StatusOK, "error.html", H{})
 }
-

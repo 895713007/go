@@ -12,6 +12,10 @@ import (
 	"os"
 )
 
+const (
+	ConfigServer = os.Getenv("CONFIG_SERVER")
+)
+
 type httpDriver struct {
 	Host       string
 	HttpClient *http.Client
@@ -51,7 +55,7 @@ func NewHttpDriver(opts ...Option) Driver {
 	}
 
 	if options.Host == "" {
-		options.Host = os.Getenv("CONFIG_SERVER")
+		options.Host = ConfigServer
 	}
 
 	return &httpDriver{
