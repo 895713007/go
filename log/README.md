@@ -17,7 +17,7 @@ import package
 
 ```
 import (
-    "github.com/mytokenio/go_sdk/log"
+    "github.com/mytokenio/go/log"
     "github.com/sirupsen/logrus" //if need log type or context data (fields)
 )
 ```

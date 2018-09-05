@@ -6,7 +6,7 @@ import package
 
 ```
 import (
-    "github.com/mytokenio/go_sdk/config"
+    "github.com/mytokenio/go/config"
 )
 ```
 

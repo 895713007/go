@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/mytokenio/go_sdk/web"
-	"github.com/mytokenio/go_sdk/log"
-	"github.com/mytokenio/go_sdk/registry"
+	"github.com/mytokenio/go/web"
+	"github.com/mytokenio/go/log"
+	"github.com/mytokenio/go/registry"
 	"flag"
 )
 

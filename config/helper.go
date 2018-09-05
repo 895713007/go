@@ -3,7 +3,7 @@ package config
 import (
 	"strings"
 	"strconv"
-	"github.com/mytokenio/go_sdk/log"
+	"github.com/mytokenio/go/log"
 	"fmt"
 )
 

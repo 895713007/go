@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/mytokenio/go_sdk/log"
-	"github.com/mytokenio/go_sdk/config"
+	"github.com/mytokenio/go/log"
+	"github.com/mytokenio/go/config"
 	"time"
-	"github.com/mytokenio/go_sdk/registry"
+	"github.com/mytokenio/go/registry"
 	"google.golang.org/grpc/metadata"
 	"encoding/json"
-	"github.com/mytokenio/go_sdk/config/driver"
+	"github.com/mytokenio/go/config/driver"
 )
 
 func main() {

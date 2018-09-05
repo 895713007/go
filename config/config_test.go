@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 	"runtime"
-	"github.com/mytokenio/go_sdk/config/driver"
+	"github.com/mytokenio/go/config/driver"
 	"strings"
 	"os"
 )

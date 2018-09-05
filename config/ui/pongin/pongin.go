@@ -11,7 +11,7 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
-	"github.com/mytokenio/go_sdk/log"
+	"github.com/mytokenio/go/log"
 )
 
 // RenderOptions is used to configure the renderer.

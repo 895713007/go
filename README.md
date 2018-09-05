@@ -5,30 +5,30 @@
 log based on `logrus`, support sync to mytoken log server
 
 ```
-go get github.com/mytokenio/go_sdk/log
+go get github.com/mytokenio/go/log
 ```
 
 ```
 import (
-    "github.com/mytokenio/go_sdk/log"
+    "github.com/mytokenio/go/log"
 )
 
 log.Info("xxx log")
 log.WithField("kkk", "vvv", "custom_type").Info("log with type & kv data")
 ```
 
-[more detail](https://github.com/mytokenio/go_sdk/tree/master/log)
+[more detail](https://github.com/mytokenio/go/tree/master/log)
 
 ## Config
 
 
 ```
-go get github.com/mytokenio/go_sdk/config
+go get github.com/mytokenio/go/config
 ```
 
 ```
 import (
-    "github.com/mytokenio/go_sdk/config"
+    "github.com/mytokenio/go/config"
 )
 
 mc := &MyConfig{}
@@ -45,7 +45,7 @@ c.Watch(func(c *config.Config) error {
 })
 ```
 
-[more detail](https://github.com/mytokenio/go_sdk/tree/master/config)
+[more detail](https://github.com/mytokenio/go/tree/master/config)
 
 
 ## TODO

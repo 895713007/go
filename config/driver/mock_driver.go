@@ -2,7 +2,7 @@ package driver
 
 import (
 	"sync"
-	"github.com/mytokenio/go_sdk/log"
+	"github.com/mytokenio/go/log"
 	"fmt"
 	"errors"
 )

@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 	"net"
-	"github.com/mytokenio/go_sdk/registry"
-	"github.com/mytokenio/go_sdk/log"
+	"github.com/mytokenio/go/registry"
+	"github.com/mytokenio/go/log"
 	"time"
 	"strconv"
 )

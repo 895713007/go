@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"github.com/mytokenio/go_sdk/config/ui/pongin"
+	"github.com/mytokenio/go/config/ui/pongin"
 	"github.com/flosch/pongo2"
-	"github.com/mytokenio/go_sdk/config/driver"
-	"github.com/mytokenio/go_sdk/config"
+	"github.com/mytokenio/go/config/driver"
+	"github.com/mytokenio/go/config"
 )
 
 type H = pongo2.Context

@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/mytokenio/go_sdk/config/driver"
-	"github.com/mytokenio/go_sdk/log"
+	"github.com/mytokenio/go/config/driver"
+	"github.com/mytokenio/go/log"
 	"time"
 	"runtime/debug"
 )

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/mytokenio/go_sdk/config/driver"
+	"github.com/mytokenio/go/config/driver"
 	"time"
 )
 

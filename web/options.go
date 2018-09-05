@@ -2,7 +2,7 @@ package web
 
 import (
 	"net/http"
-	"github.com/mytokenio/go_sdk/registry"
+	"github.com/mytokenio/go/registry"
 	"google.golang.org/grpc/metadata"
 )
 

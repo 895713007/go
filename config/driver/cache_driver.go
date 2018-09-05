@@ -3,7 +3,7 @@ package driver
 import (
 	"sync"
 	"time"
-	"github.com/mytokenio/go_sdk/log"
+	"github.com/mytokenio/go/log"
 	"errors"
 )
 
