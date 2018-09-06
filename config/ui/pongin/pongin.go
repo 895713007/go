@@ -11,7 +11,6 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
-	"github.com/mytokenio/go/log"
 )
 
 // RenderOptions is used to configure the renderer.
@@ -64,7 +63,6 @@ func (p Pongo2Render) Instance(name string, data interface{}) render.Render {
 		case pongo2.Context:
 			ctx = h
 	}
-	log.Errorf("ctx %v+", ctx)
 	return Pongo2Render{
 		Template: template,
 		Context:  ctx,

@@ -44,13 +44,7 @@ func (d *fileDriver) Get(key string) (*Value, error) {
 		return nil, err
 	}
 
-	info, err := fh.Stat()
-	if err != nil {
-		return nil, err
-	}
-
 	v := NewValue(key, b)
-	v.Timestamp = info.ModTime().Unix()
 	v.Format = strings.TrimLeft(filepath.Ext(path), ".")
 	return v, nil
 }

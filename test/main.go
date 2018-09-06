@@ -12,6 +12,7 @@ import (
 
 func main() {
 	testFileConfig()
+	//testHttpConfig()
 	time.Sleep(time.Minute)
 }
 
@@ -79,7 +80,7 @@ func testHttpConfig() {
 		config.TTL(time.Second*10), //cache ttl
 		config.Driver(
 			driver.NewHttpDriver(
-				driver.Host("http://xxx.com"),
+				driver.Host("http://127.0.0.1:8083"),
 				driver.Timeout(time.Second*3),
 			),
 		),

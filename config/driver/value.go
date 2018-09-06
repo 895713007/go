@@ -14,7 +14,6 @@ import (
 type Value struct {
 	K         string
 	V         []byte
-	Timestamp int64  //timestamp
 	Format    string //json, yml, yaml, toml, ...
 	CheckSum  string
 	Metadata  map[string]string

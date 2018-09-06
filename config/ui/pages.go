@@ -7,6 +7,7 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/mytokenio/go/config/driver"
 	"github.com/mytokenio/go/config"
+	"github.com/mytokenio/go/log"
 )
 
 type H = pongo2.Context
@@ -19,6 +20,7 @@ func init() {
 	} else {
 		d = driver.NewFileDriver()
 	}
+	log.Infof("ui config driver: %s", d)
 }
 
 func getHandler() *gin.Engine {
@@ -38,10 +40,9 @@ func getHandler() *gin.Engine {
 	e.Static("/static", "./static")
 
 	//basic http auth
-	//g := e.Group("/", gin.BasicAuth(gin.Accounts{
-	//	"admin":   "admin",
-	//}))
-	g := e.Group("/")
+	g := e.Group("/", gin.BasicAuth(gin.Accounts{
+		"admin":   "admin",
+	}))
 
 	g.GET("/", pageIndex)
 	g.GET("/list", pageList)
@@ -91,8 +92,9 @@ func pageEdit(c *gin.Context) {
 		flashMsg("key not exists, submit to create")
 	}
 
+	log.Errorf("key %s %s", key, value.V)
 	c.HTML(http.StatusOK, "edit.html", H{
-		"key":   key,
+		"key":   value.K,
 		"value": value,
 	})
 }
@@ -111,7 +113,11 @@ func pagePostEdit(c *gin.Context) {
 	}
 
 	value := driver.NewValue(key, []byte(content))
-	d.Set(value)
+	err := d.Set(value)
+	if err != nil {
+		pageError(c, "update failed: " + err.Error())
+		return
+	}
 
 	flashMsg("update success")
 	c.Redirect(302, "/edit/"+key)

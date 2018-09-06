@@ -113,7 +113,7 @@ func (c *Config) doOnChange() error {
 // get by service name
 func (c *Config) GetServiceConfig() (*driver.Value, error) {
 	value, err := c.Get(c.genServiceKey())
-	if c.checkSum == "" {
+	if err == nil && c.checkSum == "" {
 		c.checkSum = value.CheckSum
 	}
 	return value, err

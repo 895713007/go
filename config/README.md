@@ -89,9 +89,11 @@ c.Watch(...)
 
 ### UI (for http driver)
 
+config server [mytokenio/venus_config_center](https://github.com/mytokenio/venus_config_center)
 ```
 cd ui/
 go build .
+export CONFIG_SERVER=http://127.0.0.1:8083
 ./ui
 ```
 open `http://127.0.0.1:5556`
