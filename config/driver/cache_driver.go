@@ -1,10 +1,9 @@
 package driver
 
 import (
+	"github.com/mytokenio/go/log"
 	"sync"
 	"time"
-	"github.com/mytokenio/go/log"
-	"errors"
 )
 
 //for TTL check
@@ -48,8 +47,9 @@ func NewCacheDriver(opts ...Option) Driver {
 	}
 }
 
+//do not cache for list
 func (d *cacheDriver) List() ([]*Value, error) {
-	return nil, errors.New("TODO")
+	return d.SubDriver.List()
 }
 
 func (d *cacheDriver) Get(key string) (*Value, error) {

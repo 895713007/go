@@ -178,14 +178,15 @@ func (d *httpDriver) request(method string, path string, data []byte) (json.RawM
 
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
-	if resp.StatusCode == http.StatusOK {
-		err = nil
-	} else {
-		err = errors.New(fmt.Sprintf("http status code %d, body %s", resp.StatusCode, respBody))
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("http status code %d, body %s", resp.StatusCode, respBody)
 	}
 
 	rsp := &Response{}
-	json.Unmarshal(respBody, rsp)
+	err = json.Unmarshal(respBody, rsp)
+	if err != nil {
+		return nil, fmt.Errorf("response json unmarshal error %s, body %s", err, respBody)
+	}
 	if rsp.Code != CodeSuccess {
 		dataErr := &DataError{}
 		json.Unmarshal(rsp.Data, dataErr)
