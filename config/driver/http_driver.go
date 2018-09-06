@@ -30,6 +30,7 @@ type Request struct {
 	Value     string `json:"value"`
 	Comment   string `json:"comment"`
 	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
 }
 
 type Config struct {
@@ -40,6 +41,7 @@ type Config struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
+
 func (c Config) toMetadata() map[string]string {
 	return map[string]string {
 		"comment": c.Comment,
@@ -141,21 +143,25 @@ func (d *httpDriver) Get(key string) (*Value, error) {
 
 func (d *httpDriver) Set(value *Value) error {
 	uri := "/v1/config/item"
+	method := "POST" //create
 	req := Request{
 		Key:       value.K,
 		Value:     value.String(),
-		Comment:   "",
-		CreatedBy: "sdk",
 	}
-	reqBytes, _ := json.Marshal(req)
 
-	var b []byte
+	//check for update
 	existValue, err := d.Get(value.K)
 	if existValue != nil {
-		b, err = d.request("PATCH", uri, reqBytes)
+		uri = fmt.Sprintf("/v1/config/item/%s", value.K)
+		method = "PATCH"
+		req.UpdatedBy = "sdk"
 	} else {
-		b, err = d.request("POST", uri, reqBytes)
+		req.CreatedBy = "sdk"
 	}
+
+	var b []byte
+	reqBytes, _ := json.Marshal(req)
+	b, err = d.request(method, uri, reqBytes)
 	if err != nil {
 		return fmt.Errorf("post failed %s", err)
 	}
