@@ -71,7 +71,6 @@ func (c *Config) Watch(fn OnChangeFn, duration ... time.Duration) {
 		for {
 			select {
 			case <-ticker.C:
-				log.Infof("watching...")
 				c.watchChange()
 			}
 		}
@@ -81,9 +80,10 @@ func (c *Config) Watch(fn OnChangeFn, duration ... time.Duration) {
 func (c *Config) watchChange() {
 	v, err := c.GetServiceConfig()
 	if err != nil {
-		log.Errorf("error get config %s", err)
+		log.Errorf("error get config %s %s", c.Service, err)
+		return
 	}
-	log.Infof("watchChange %s %s", v.CheckSum, c.checkSum)
+	log.Infof("watchChange %v %s %s", v, v.CheckSum, c.checkSum)
 	if v.CheckSum != c.checkSum {
 		err = c.doOnChange()
 		if err == nil {
@@ -98,8 +98,6 @@ func (c *Config) doOnChange() error {
 			log.Errorf("OnChange callback panic %v %s", r, debug.Stack())
 		}
 	}()
-
-	log.Infof("onchange fn %v+", c.OnChange)
 
 	if err := c.OnChange(c); err != nil {
 		log.Errorf("OnChange callback error %s", err)

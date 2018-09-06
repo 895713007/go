@@ -33,7 +33,20 @@ type Request struct {
 	UpdatedBy string `json:"updated_by"`
 }
 
-type Config struct {
+type Response struct {
+	Code      int             `json:"code"`
+	Msg       string          `json:"msg"`
+	Timestamp string          `json:"timestamp"`
+	Data      json.RawMessage `json:"data"`
+}
+
+// {"code":-1,"msg":"error","data":{"error":"sql: no rows in result set","reason":"Query data error"},"timestsamp":1536223015}
+type DataError struct {
+	Error  string `json:"error"`
+	Reason string `json:"reason"`
+}
+
+type DataConfig struct {
 	Key       string `json:"key"`
 	Value     string `json:"value"`
 	Comment   string `json:"comment"`
@@ -42,27 +55,13 @@ type Config struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-func (c Config) toMetadata() map[string]string {
-	return map[string]string {
-		"comment": c.Comment,
+func (c DataConfig) toMetadata() map[string]string {
+	return map[string]string{
+		"comment":    c.Comment,
 		"updated_by": c.UpdatedBy,
 		"updated_at": c.UpdatedAt,
 		"created_at": c.CreatedAt,
 	}
-}
-
-type Response struct {
-	Code      int     `json:"code"`
-	Msg       string  `json:"msg"`
-	Timestamp string  `json:"timestamp"`
-	Data      *Config `json:"data"`
-}
-
-type ListResponse struct {
-	Code      int       `json:"code"`
-	Msg       string    `json:"msg"`
-	Timestamp string    `json:"timestamp"`
-	Data      []*Config `json:"data"`
 }
 
 func NewHttpDriver(opts ...Option) Driver {
@@ -95,13 +94,14 @@ func (d *httpDriver) List() ([]*Value, error) {
 		return nil, err
 	}
 
-	rsp := &ListResponse{}
-	json.Unmarshal(b, rsp)
-	if rsp.Code != CodeSuccess {
-		return nil, fmt.Errorf("get error %s", rsp.Msg)
+	cs := &[]*DataConfig{}
+	err = json.Unmarshal(b, cs)
+	if err != nil {
+		log.Errorf("json unmarshal error %s", err)
+		return nil, fmt.Errorf("json unmarshal error %s", err)
 	}
 
-	for _, c := range rsp.Data {
+	for _, c := range *cs {
 		v := &Value{
 			K: c.Key,
 			V: []byte(c.Value),
@@ -121,23 +121,14 @@ func (d *httpDriver) Get(key string) (*Value, error) {
 		return nil, err
 	}
 
-	rsp := &Response{}
-	if rsp.Code != CodeSuccess {
-		return nil, fmt.Errorf("get error %s", rsp.Msg)
-	}
-	err = json.Unmarshal(b, rsp)
+	c := &DataConfig{}
+	err = json.Unmarshal(b, c)
 	if err != nil {
 		log.Errorf("json unmarshal error %s", err)
 		return nil, fmt.Errorf("json unmarshal error %s", err)
 	}
 
-	c := rsp.Data
-	v := &Value{
-		K: c.Key,
-		V: []byte(c.Value),
-		//Format:    "toml",
-		Metadata: c.toMetadata(),
-	}
+	v := NewValue(c.Key, []byte(c.Value))
 	return v, nil
 }
 
@@ -145,8 +136,8 @@ func (d *httpDriver) Set(value *Value) error {
 	uri := "/v1/config/item"
 	method := "POST" //create
 	req := Request{
-		Key:       value.K,
-		Value:     value.String(),
+		Key:   value.K,
+		Value: value.String(),
 	}
 
 	//check for update
@@ -159,23 +150,15 @@ func (d *httpDriver) Set(value *Value) error {
 		req.CreatedBy = "sdk"
 	}
 
-	var b []byte
 	reqBytes, _ := json.Marshal(req)
-	b, err = d.request(method, uri, reqBytes)
+	_, err = d.request(method, uri, reqBytes)
 	if err != nil {
 		return fmt.Errorf("post failed %s", err)
 	}
-
-	rsp := &Response{}
-	json.Unmarshal(b, rsp)
-	if rsp.Code != CodeSuccess {
-		return fmt.Errorf("response error %s", rsp.Msg)
-	}
-
 	return nil
 }
 
-func (d *httpDriver) request(method string, path string, data []byte) ([]byte, error) {
+func (d *httpDriver) request(method string, path string, data []byte) (json.RawMessage, error) {
 	if d.Host == "" {
 		return nil, errors.New("config server host empty")
 	}
@@ -200,7 +183,16 @@ func (d *httpDriver) request(method string, path string, data []byte) ([]byte, e
 	} else {
 		err = errors.New(fmt.Sprintf("http status code %d, body %s", resp.StatusCode, respBody))
 	}
-	return respBody, err
+
+	rsp := &Response{}
+	json.Unmarshal(respBody, rsp)
+	if rsp.Code != CodeSuccess {
+		dataErr := &DataError{}
+		json.Unmarshal(rsp.Data, dataErr)
+		return nil, fmt.Errorf("response msg: %s, url: %s, body: %s, error: %s, reason: %s", rsp.Msg, url, body, dataErr.Error, dataErr.Reason)
+	}
+
+	return rsp.Data, err
 }
 
 func (d *httpDriver) String() string {
