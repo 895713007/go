@@ -110,11 +110,7 @@ func (c *Config) doOnChange() error {
 
 // get by service name
 func (c *Config) GetServiceConfig() (*driver.Value, error) {
-	value, err := c.Get(c.genServiceKey())
-	if err == nil && c.checkSum == "" {
-		c.checkSum = value.CheckSum
-	}
-	return value, err
+	return c.Get(c.genServiceKey())
 }
 
 //TODO 命名规则目前仅用于 service, 先写死前缀，后续改进
