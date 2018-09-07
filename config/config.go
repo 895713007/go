@@ -20,7 +20,7 @@ type Config struct {
 	checkSum string
 }
 
-type OnChangeFn func(*Config) error
+type OnChangeFn func() error
 
 func NewConfig(opts ...Option) *Config {
 	options := newOptions(opts...)
@@ -99,7 +99,7 @@ func (c *Config) doOnChange() error {
 		}
 	}()
 
-	if err := c.OnChange(c); err != nil {
+	if err := c.OnChange(); err != nil {
 		log.Errorf("OnChange callback error %s", err)
 		return err
 	}
