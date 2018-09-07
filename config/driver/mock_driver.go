@@ -1,10 +1,9 @@
 package driver
 
 import (
-	"sync"
-	"github.com/mytokenio/go/log"
 	"fmt"
-	"errors"
+	"github.com/mytokenio/go/log"
+	"sync"
 )
 
 type mockDriver struct {
@@ -19,7 +18,11 @@ func NewMockDriver() Driver {
 }
 
 func (d *mockDriver) List() ([]*Value, error) {
-	return nil, errors.New("TODO")
+	var vals []*Value
+	for _, v := range d.KV {
+		vals = append(vals, v)
+	}
+	return vals, nil
 }
 
 func (d *mockDriver) Get(key string) (*Value, error) {

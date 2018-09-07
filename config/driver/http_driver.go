@@ -102,12 +102,8 @@ func (d *httpDriver) List() ([]*Value, error) {
 	}
 
 	for _, c := range *cs {
-		v := &Value{
-			K: c.Key,
-			V: []byte(c.Value),
-			//Format:    "toml",
-			Metadata: c.toMetadata(),
-		}
+		v := NewValue(c.Key, []byte(c.Value))
+		v.Metadata = c.toMetadata()
 		vals = append(vals, v)
 	}
 
