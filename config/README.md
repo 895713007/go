@@ -60,7 +60,7 @@ toml.Unmarshal(b, mc)
 
 default watch interval 5 seconds,
 ```
-c.Watch(func(c *config.Config) error {
+c.Watch(func() error {
     err := c.BindTOML(mc)
     if err != nil {
         log.Errorf("config bind error %s", err)

@@ -38,7 +38,7 @@ c := config.NewConfig()
 c.BindTOML(mc)
 
 // or, watch change
-c.Watch(func(c *config.Config) error {
+c.Watch(func() error {
     err := c.BindTOML(mc)
     // TODO
     return nil
