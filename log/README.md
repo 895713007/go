@@ -37,10 +37,15 @@ log.Type("your_type").Infof("test format info log %s", xxx)
 type and context data (fields):
 ```
 fields := logrus.Fields{
-    "aa": "bb",
-    "cc": "dd",
+    "k1": "v1",
+    "k2": "v2",
 }
 log.Type("test").WithFields(fields).Info("log with fields and type")
+```
+
+or fields as pairs, above code equal to:
+```
+log.With("k1", "v1", "k2", "v2", "type", "test").Info("log with fields and type")
 ```
 
 log type would be a part of elasticsearch index name, format `golog-{type}-{date}`

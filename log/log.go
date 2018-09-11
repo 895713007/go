@@ -62,6 +62,22 @@ func Type(typ string) *logrus.Entry {
 	return log.WithField(typeField, typ)
 }
 
+func With(pairs ...string) *logrus.Entry {
+	if len(pairs)%2 != 0 {
+		pairs = append(pairs, "unknown")
+	}
+
+	fields := logrus.Fields{}
+	for i := 0; i < len(pairs); i += 2 {
+		fields[pairs[i]] = pairs[i+1]
+		if pairs[i] == "type" {
+			fields[typeField] = pairs[i+1]
+		}
+	}
+
+	return log.WithFields(fields)
+}
+
 func WithField(key string, value interface{}, typ string) *logrus.Entry {
 	return log.WithField(typeField, typ).WithField(key, value)
 }
