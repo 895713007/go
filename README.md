@@ -74,11 +74,11 @@ c.With("k1": "v1", "k2", "v2", ...).Incr(123)
 g.With("k1": "v1", "k2", "v2", ...).Set(123)
 ```
 
+[more detail](https://github.com/mytokenio/go/tree/master/metrics)
 
 ## TODO
 
 service registry/broker/health
-
 
 rpc server/client/protocol
 
