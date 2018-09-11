@@ -79,7 +79,6 @@ g.With("k1": "v1", "k2", "v2", ...).Set(123)
 
 service registry/broker/health
 
-metrics
 
 rpc server/client/protocol
 
