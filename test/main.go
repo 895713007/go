@@ -22,22 +22,19 @@ func testMetrics() {
 	m := es.New("test", "127.0.0.1:9200")
 	defer m.Close()
 
-	c := m.Counter("test-counter").With("kk", "vv", "ddd", "fff", "eee")
-	g := m.Gauge("test-gauge").With("hh", "gg", "vv", "1234")
+	c := m.Counter("counter")
+	g := m.Gauge("test-gauge")
 
 	go func() {
 		for i := 0; i < 1000; i++ {
 			c.Incr(10)
-			c.Decr(10)
-			g.Set(float64(i))
+			g.Set(int64(i))
 			time.Sleep(time.Second)
 		}
 	}()
 
 	time.Sleep(time.Minute)
 }
-
-
 
 
 type MyConfig struct {

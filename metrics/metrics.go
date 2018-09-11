@@ -6,7 +6,7 @@ import "time"
 // internal/kv reference to gokit
 
 var (
-	BatchInterval = time.Second * 2
+	BatchInterval = time.Second * 5
 )
 
 // metric service, to create, call, close
@@ -18,14 +18,14 @@ type Metrics interface {
 }
 
 type Counter interface {
-	Incr(d float64)
-	Decr(d float64)
-	Value() float64
+	Incr(delta int64)
+	Decr(delta int64)
+	Value() int64
 	With(pair ...string) Counter
 }
 
 type Gauge interface {
-	Set(d float64)
-	Value() float64
+	Set(value int64)
+	Value() int64
 	With(pair ...string) Gauge
 }

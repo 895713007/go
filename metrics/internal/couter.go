@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"github.com/mytokenio/go/log"
 	"github.com/mytokenio/go/metrics"
 	"github.com/mytokenio/go/metrics/internal/lv"
 )
@@ -29,15 +28,14 @@ func (c *Counter) With(labelValues ...string) metrics.Counter {
 	}
 }
 
-func (c *Counter) Incr(delta float64) {
-	log.Infof("incr %s %f", c.name, delta)
-	c.obs(c.name, c.lvs, delta)
+func (c *Counter) Incr(delta int64) {
+	c.obs(c.name, c.lvs, float64(delta))
 }
 
-func (c *Counter) Decr(delta float64) {
-	c.obs(c.name, c.lvs, -delta)
+func (c *Counter) Decr(delta int64) {
+	c.obs(c.name, c.lvs, float64(-delta))
 }
 
-func (c *Counter) Value() float64 {
-	return c.val(c.name)
+func (c *Counter) Value() int64 {
+	return int64(c.val(c.name))
 }

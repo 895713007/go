@@ -41,6 +41,7 @@ func (s *Space) Walk(fn func(name string, lvs LabelValues, observations []float6
 	}
 }
 
+//added for walk node by name
 func (s *Space) WalkNode(name string, fn func(lvs LabelValues, observations []float64) bool) {
 	s.mtx.RLock()
 	defer s.mtx.RUnlock()

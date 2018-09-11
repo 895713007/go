@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"github.com/mytokenio/go/log"
 	"github.com/mytokenio/go/metrics"
 	"github.com/mytokenio/go/metrics/internal/lv"
 )
@@ -32,11 +31,10 @@ func (g *Gauge) With(labelValues ...string) metrics.Gauge {
 	}
 }
 
-func (g *Gauge) Set(value float64) {
-	log.Infof("gset %s %f", g.name, value)
-	g.obs(g.name, g.lvs, value)
+func (g *Gauge) Set(value int64) {
+	g.obs(g.name, g.lvs, float64(value))
 }
 
-func (g *Gauge) Value() float64 {
-	return g.val(g.name)
+func (g *Gauge) Value() int64 {
+	return int64(g.val(g.name))
 }
