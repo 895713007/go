@@ -1,4 +1,4 @@
-package es
+package logger
 
 import (
 	"github.com/mytokenio/go/log"
@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-type es struct {
+type logger struct {
 	namespace string
 	addr      string
 	exit      chan bool
@@ -19,7 +19,7 @@ type es struct {
 }
 
 func New(namespace, addr string) metrics.Metrics {
-	m := &es{
+	m := &logger{
 		namespace: namespace,
 		addr:      addr,
 		exit:      make(chan bool),
@@ -30,15 +30,15 @@ func New(namespace, addr string) metrics.Metrics {
 	return m
 }
 
-func (m *es) String() string {
+func (m *logger) String() string {
 	return "es"
 }
 
-func (m *es) Counter(name string) metrics.Counter {
-	return internal.NewCounter(name, m.counters.Observe, lv.LabelValues{})
+func (m *logger) Counter(name string) metrics.Counter {
+	return internal.NewCounter(name, m.counters.Observe, m.counterVal, lv.LabelValues{})
 }
 
-func (m *es) counterVal(name string) float64 {
+func (m *logger) counterVal(name string) float64 {
 	var val float64
 	m.counters.WalkNode(name, func(lvs lv.LabelValues, values []float64) bool {
 		val += sum(values)
@@ -47,20 +47,20 @@ func (m *es) counterVal(name string) float64 {
 	return val
 }
 
-func (m *es) Gauge(name string) metrics.Gauge {
-	return internal.NewGauge(name, m.gauges.Observe, m.gauges.Add, lv.LabelValues{})
+func (m *logger) Gauge(name string) metrics.Gauge {
+	return internal.NewGauge(name, m.gauges.Observe, m.gauges.Add, m.gaugeVal, lv.LabelValues{})
 }
 
-func (m *es) gaugeVal(name string) float64 {
+func (m *logger) gaugeVal(name string) float64 {
 	var val float64
-	m.counters.WalkNode(name, func(lvs lv.LabelValues, values []float64) bool {
+	m.gauges.WalkNode(name, func(lvs lv.LabelValues, values []float64) bool {
 		val = last(values)
 		return true
 	})
 	return val
 }
 
-func (m *es) run() {
+func (m *logger) run() {
 	t := time.NewTicker(metrics.BatchInterval)
 	conn, err := net.DialTimeout("udp", m.addr, time.Second)
 	if err != nil {
@@ -71,6 +71,7 @@ func (m *es) run() {
 	for {
 		select {
 		case <-m.exit:
+			log.Infof("logger metrics exited")
 			t.Stop()
 			return
 		case <-t.C:
@@ -79,7 +80,7 @@ func (m *es) run() {
 	}
 }
 
-func (m *es) Close() error {
+func (m *logger) Close() error {
 	select {
 	case <-m.exit:
 		return nil
@@ -89,7 +90,7 @@ func (m *es) Close() error {
 	return nil
 }
 
-func (m *es) writeTo(w io.Writer) (count int64, err error) {
+func (m *logger) writeTo(w io.Writer) (count int64, err error) {
 	var n int
 
 	m.counters.Reset().Walk(func(name string, lvs lv.LabelValues, values []float64) bool {
@@ -123,8 +124,10 @@ func (m *es) writeTo(w io.Writer) (count int64, err error) {
 
 func lvPair(labelValues []string) map[string]string {
 	if len(labelValues)%2 != 0 {
-		panic("lvPair received a labelValues with an odd number of strings")
+		log.Errorf("lvPair received a labelValues with an odd number of strings")
+		return map[string]string{}
 	}
+
 	ret := make(map[string]string, len(labelValues)/2)
 	for i := 0; i < len(labelValues); i += 2 {
 		ret[labelValues[i]] = labelValues[i+1]

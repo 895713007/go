@@ -9,12 +9,13 @@ var (
 	BatchInterval = time.Second * 5
 )
 
-// metric service, to create, call, close
+// abstraction for metrics backend
 type Metrics interface {
-	Close() error
+	//backend name
+	String() string
 	Counter(id string) Counter
 	Gauge(id string) Gauge
-	String() string
+	Close() error
 }
 
 type Counter interface {

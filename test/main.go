@@ -5,7 +5,7 @@ import (
 	"github.com/mytokenio/go/config"
 	"github.com/mytokenio/go/config/driver"
 	"github.com/mytokenio/go/log"
-	"github.com/mytokenio/go/metrics/es"
+	"github.com/mytokenio/go/metrics/logger"
 	"github.com/mytokenio/go/registry"
 	"google.golang.org/grpc/metadata"
 	"time"
@@ -15,11 +15,10 @@ func main() {
 	//testFileConfig()
 	//testHttpConfig()
 	testMetrics()
-	time.Sleep(time.Minute)
 }
 
 func testMetrics() {
-	m := es.New("test", "127.0.0.1:9200")
+	m := logger.New("test", "127.0.0.1:12333")
 	defer m.Close()
 
 	c := m.Counter("counter")
@@ -28,7 +27,9 @@ func testMetrics() {
 	go func() {
 		for i := 0; i < 1000; i++ {
 			c.Incr(10)
+			log.Infof("counter val %d", c.Value())
 			g.Set(int64(i))
+			log.Infof("gauge val %d", g.Value())
 			time.Sleep(time.Second)
 		}
 	}()

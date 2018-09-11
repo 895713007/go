@@ -5,11 +5,12 @@ import (
 	"github.com/mytokenio/go/metrics/internal/lv"
 )
 
-func NewCounter(name string, obs observeFunc, labelValues lv.LabelValues) metrics.Counter {
+func NewCounter(name string, obs observeFunc, val valFunc, lvs lv.LabelValues) metrics.Counter {
 	return &Counter{
 		name: name,
-		lvs:  labelValues,
+		lvs:  lvs,
 		obs:  obs,
+		val:  val,
 	}
 }
 

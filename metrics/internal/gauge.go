@@ -5,12 +5,13 @@ import (
 	"github.com/mytokenio/go/metrics/internal/lv"
 )
 
-func NewGauge(name string, obs observeFunc, add observeFunc, labelValues lv.LabelValues) metrics.Gauge {
+func NewGauge(name string, obs observeFunc, add observeFunc, val valFunc, lvs lv.LabelValues) metrics.Gauge {
 	return &Gauge{
 		name: name,
-		lvs:  labelValues,
+		lvs:  lvs,
 		obs:  obs,
 		add:  add,
+		val:  val,
 	}
 }
 
