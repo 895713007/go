@@ -1,20 +1,44 @@
 package main
 
 import (
-	"github.com/mytokenio/go/log"
+	"encoding/json"
 	"github.com/mytokenio/go/config"
-	"time"
+	"github.com/mytokenio/go/config/driver"
+	"github.com/mytokenio/go/log"
+	"github.com/mytokenio/go/metrics/es"
 	"github.com/mytokenio/go/registry"
 	"google.golang.org/grpc/metadata"
-	"encoding/json"
-	"github.com/mytokenio/go/config/driver"
+	"time"
 )
 
 func main() {
-	testFileConfig()
+	//testFileConfig()
 	//testHttpConfig()
+	testMetrics()
 	time.Sleep(time.Minute)
 }
+
+func testMetrics() {
+	m := es.New("test", "127.0.0.1:9200")
+	defer m.Close()
+
+	c := m.Counter("test-counter").With("kk", "vv", "ddd", "fff", "eee")
+	g := m.Gauge("test-gauge").With("hh", "gg", "vv", "1234")
+
+	go func() {
+		for i := 0; i < 1000; i++ {
+			c.Incr(10)
+			c.Decr(10)
+			g.Set(float64(i))
+			time.Sleep(time.Second)
+		}
+	}()
+
+	time.Sleep(time.Minute)
+}
+
+
+
 
 type MyConfig struct {
 	API string `toml:"api"`
@@ -30,7 +54,8 @@ type MyConfig struct {
 func testFileConfig() {
 	mc := &MyConfig{}
 
-	config.NewConfig().Watch(func(c *config.Config) error {
+	c := config.NewConfig()
+	c.Watch(func() error {
 		err := c.BindTOML(mc)
 		if err != nil {
 			log.Errorf("config bind error %s", err)
@@ -40,14 +65,14 @@ func testFileConfig() {
 		log.Infof("service config changed %v", mc)
 		return nil
 	})
-	//
+
 	//c := config.NewConfig(
 	//	config.TTL(10 * time.Second),
 	//	config.Driver(
 	//		driver.NewFileDriver(driver.Path("config.toml")),
 	//	),
 	//)
-	//c.Watch(func(c *config.Config) error {
+	//c.Watch(func() error {
 	//	err := c.BindTOML(mc)
 	//	if err != nil {
 	//		log.Errorf("config bind error %s", err)

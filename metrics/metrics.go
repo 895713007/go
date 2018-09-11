@@ -1,12 +1,16 @@
 package metrics
 
-// reference to https://github.com/rcrowley/go-metrics
+import "time"
 
-type Fields map[string]string
+// reference to https://github.com/rcrowley/go-metrics
+// internal/kv reference to gokit
+
+var (
+	BatchInterval = time.Second * 2
+)
 
 // metric service, to create, call, close
 type Metrics interface {
-	Init() error
 	Close() error
 	Counter(id string) Counter
 	Gauge(id string) Gauge
@@ -14,17 +18,14 @@ type Metrics interface {
 }
 
 type Counter interface {
-	Clear()
-	Incr(d uint64)
-	Decr(d uint64)
-	Value() int64
-	WithFields(f Fields) Counter
+	Incr(d float64)
+	Decr(d float64)
+	Value() float64
+	With(pair ...string) Counter
 }
 
 type Gauge interface {
-	Clear()
-	Update(d int64)
-	Value() int64
-	WithFields(f Fields) Gauge
+	Set(d float64)
+	Value() float64
+	With(pair ...string) Gauge
 }
-
