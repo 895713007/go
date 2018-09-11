@@ -47,6 +47,33 @@ c.Watch(func() error {
 
 [more detail](https://github.com/mytokenio/go/tree/master/config)
 
+## Metrics
+
+```go
+//import metrics backend service
+import "github.com/mytokenio/go/metrics/logger"
+
+//init with metrics namespace and logger server address
+m := logger.New("test", "127.0.0.1:12333")
+defer m.Close()
+
+//create counter/gauge instance
+c := m.Counter("counter")
+g := m.Gauge("test-gauge")
+
+//call counter/gauge
+c.Incr(10)
+log.Infof("counter value %d", c.Value())
+
+g.Set(1234)
+log.Infof("gauge value %d", g.Value())
+
+// with kv pair
+c.With("k1": "v1", "k2", "v2", ...).Incr(123)
+
+g.With("k1": "v1", "k2", "v2", ...).Set(123)
+```
+
 
 ## TODO
 

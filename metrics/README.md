@@ -32,6 +32,9 @@ type Gauge interface {
 ## Usage
 
 ```go
+//import metrics backend service
+import "github.com/mytokenio/go/metrics/logger"
+
 //init with metrics namespace and logger server address
 m := logger.New("test", "127.0.0.1:12333")
 defer m.Close()

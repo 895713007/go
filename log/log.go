@@ -7,6 +7,15 @@ import (
 	"github.com/json-iterator/go"
 )
 
+const (
+	PanicLevel logrus.Level = iota
+	FatalLevel
+	ErrorLevel
+	WarnLevel
+	InfoLevel
+	DebugLevel
+)
+
 const typeField = "log_type"
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -14,25 +23,30 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var log = logrus.New()
 var extra map[string]interface{}
 var uniqueId string
-var hostname, _ = os.Hostname()
 
 func init() {
 	log.SetOutput(os.Stdout)
 
+	if _level, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err == nil {
+		logrus.Infof("set level %s %s", _level, os.Getenv("LOG_LEVEL"))
+		log.SetLevel(_level)
+	} else {
+		log.SetLevel(DebugLevel)
+	}
+	Debugf("level %s", log.Level)
+
 	server := os.Getenv("LOG_SERVER")
 	if server != "" {
-		if _level, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err != nil {
-			log.SetLevel(_level)
-		} else {
-			log.SetLevel(logrus.DebugLevel)
-		}
-
 		log.AddHook(NewEsLogHook(server))
 	}
 
 	SetExtra(map[string]interface{}{
 		"command": os.Args[0],
 	})
+}
+
+func SetLevel(level logrus.Level) {
+	log.SetLevel(level)
 }
 
 func SetExtra(h map[string]interface{}) {

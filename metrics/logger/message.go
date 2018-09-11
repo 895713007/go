@@ -34,7 +34,7 @@ func newCounterMessage(name string, n float64, fields map[string]string) []byte 
 		msg.Data["fields"] = fields
 	}
 	b, _ := json.Marshal(msg)
-	log.Infof("counter msg %s", b)
+	log.Infof("metrics counter: %s", b)
 	return b
 }
 
@@ -51,6 +51,6 @@ func newGaugeMessage(name string, n float64, fields map[string]string) []byte {
 		msg.Data["fields"] = fields
 	}
 	b, _ := json.Marshal(msg)
-	log.Infof("gauge msg %s", b)
+	log.Infof("metrics gauge: %s", b)
 	return b
 }
