@@ -31,7 +31,7 @@ func New(namespace, addr string) metrics.Metrics {
 }
 
 func (m *logger) String() string {
-	return "es"
+	return "logger"
 }
 
 func (m *logger) Counter(name string) metrics.Counter {
