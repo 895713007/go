@@ -65,6 +65,7 @@ func (m *logger) run() {
 	conn, err := net.DialTimeout("udp", m.addr, time.Second)
 	if err != nil {
 		log.Errorf("failed dial log server %v", m.addr)
+		return
 	}
 	defer conn.Close()
 
