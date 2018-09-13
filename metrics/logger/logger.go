@@ -95,6 +95,7 @@ func (m *logger) writeTo(w io.Writer) (count int64, err error) {
 	var n int
 
 	m.counters.Reset().Walk(func(name string, lvs lv.LabelValues, values []float64) bool {
+		name = m.namespace + "-" + name
 		n, err = w.Write(newCounterMessage(name, sum(values), lvPair(lvs)))
 		if err != nil {
 			return false
@@ -108,6 +109,7 @@ func (m *logger) writeTo(w io.Writer) (count int64, err error) {
 	}
 
 	m.gauges.Reset().Walk(func(name string, lvs lv.LabelValues, values []float64) bool {
+		name = m.namespace + "-" + name
 		n, err = w.Write(newGaugeMessage(name, last(values), lvPair(lvs)))
 		if err != nil {
 			return false
