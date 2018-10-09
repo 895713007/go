@@ -66,8 +66,31 @@ func TestBasic(t *testing.T) {
 		assert(t, "not nil", nil)
 	}
 
+	//mock driver
+	assert(t, c.Driver.String(), "mock")
+
 	value := driver.NewValue("foo", []byte("bar"))
 	c.Driver.Set(value)
 	v2, _ := c.Get("foo")
 	assert(t, v2.String(), "bar")
+
+}
+
+func TestDriver(t *testing.T) {
+	//default file driver
+	c1 := NewConfig()
+	assert(t, c1.Driver.String(), "file")
+
+	c1 = NewFileConfig("config.toml")
+	assert(t, c1.Driver.String(), "file")
+
+	//default http driver
+	os.Setenv("CONFIG_SERVER", "http://127.0.0.1:8083")
+	c2 := NewConfig()
+	assert(t, c2.Driver.String(), "http")
+
+	os.Setenv("CONFIG_SERVER", "")
+
+	c3 := NewConfig()
+	assert(t, c3.Driver.String(), "http")
 }

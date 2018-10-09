@@ -14,10 +14,9 @@ import (
 )
 
 const (
+	Env = "CONFIG_SERVER"
 	CodeSuccess = 0
 )
-
-var ConfigServer = os.Getenv("CONFIG_SERVER")
 
 type httpDriver struct {
 	Host       string
@@ -76,7 +75,7 @@ func NewHttpDriver(opts ...Option) Driver {
 	}
 
 	if options.Host == "" {
-		options.Host = ConfigServer
+		options.Host = os.Getenv(Env)
 	}
 
 	return &httpDriver{

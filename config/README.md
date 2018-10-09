@@ -87,6 +87,21 @@ c.BindTOML(...)
 c.Watch(...)
 ```
 
+
+### Http Driver
+
+if env `CONFIG_SERVER` not empty, the default config driver would be http driver
+
+```
+c := config.NewConfig(config.Service("your-service-name"))
+```
+
+or use shortcut:
+
+```
+c := config.NewHttpConfig("your-service-name")
+```
+
 ### UI (for http driver)
 
 moved to [mytokenio/config-manager](https://github.com/mytokenio/config-manager)

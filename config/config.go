@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/mytokenio/go/config/driver"
 	"github.com/mytokenio/go/log"
+	"os"
 	"time"
 	"runtime/debug"
 )
@@ -23,7 +24,12 @@ type Config struct {
 type OnChangeFn func() error
 
 func NewConfig(opts ...Option) *Config {
+	if os.Getenv(driver.Env) != "" {
+		driver.DefaultDriver = driver.NewHttpDriver()
+	}
+
 	options := newOptions(opts...)
+	log.Debugf("config driver %s", options.Driver)
 
 	//use cache driver if ttl > 0
 	if options.TTL > 0 {
