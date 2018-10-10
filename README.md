@@ -15,10 +15,6 @@ import (
 
 log.Info("xxx log")
 log.WithField("kkk", "vvv", "custom_type").Info("log with type & kv data")
-
-//or fields as pairs:
-log.Type("custom_type").With("k1", "v1", "k2", "v2").Info("log with field pairs and type")
-
 ```
 
 [more detail](https://github.com/mytokenio/go/tree/master/log)
