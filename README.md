@@ -8,13 +8,17 @@ log based on `logrus`, support sync to mytoken log server
 go get github.com/mytokenio/go/log
 ```
 
-```
+```go
 import (
     "github.com/mytokenio/go/log"
 )
 
 log.Info("xxx log")
 log.WithField("kkk", "vvv", "custom_type").Info("log with type & kv data")
+
+//or fields as pairs:
+log.Type("custom_type").With("k1", "v1", "k2", "v2").Info("log with field pairs and type")
+
 ```
 
 [more detail](https://github.com/mytokenio/go/tree/master/log)
@@ -26,7 +30,7 @@ log.WithField("kkk", "vvv", "custom_type").Info("log with type & kv data")
 go get github.com/mytokenio/go/config
 ```
 
-```
+```go
 import (
     "github.com/mytokenio/go/config"
 )
