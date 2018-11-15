@@ -96,4 +96,5 @@ func Panic(err error) {
 	alarm(err.Error())
 	Gauge("status", STATUS_ERROR)
 	Gauge("exit_code", EXIT_CODE_ERROR)
+	panic(err)
 }
