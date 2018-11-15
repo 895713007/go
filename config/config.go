@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"runtime/debug"
 	"time"
@@ -12,6 +13,7 @@ import (
 const (
 	DefaultWatchInterval = 60 * time.Second
 	DefaultServicePrefix = "mt.service."
+	DefaultJobPrefix     = "job_config_%d"
 )
 
 type Config struct {
@@ -129,9 +131,12 @@ func (c *Config) GetServiceConfig() (*driver.Value, error) {
 	return c.Get(c.genServiceKey())
 }
 
-//TODO 命名规则目前仅用于 service, 先写死前缀，后续改进
 func (c *Config) genServiceKey() string {
-	return DefaultServicePrefix + c.Service
+	if jobId > 0 {
+		return fmt.Sprintf(DefaultJobPrefix, jobId)
+	} else {
+		return DefaultServicePrefix + c.Service
+	}
 }
 
 // bind via config value format

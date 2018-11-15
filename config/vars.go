@@ -1,6 +1,7 @@
 package config
 
 var (
+	jobId         int64
 	currentConfig *Config
 )
 

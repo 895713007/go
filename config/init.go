@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 func init() {
 	var host string
 
-	switch strings.ToLower(os.Getenv(driver.Env)) {
+	switch strings.ToLower(os.Getenv(driver.EnvType)) {
 	case ENV_BETA:
 		host = BETA_HOST_MONITOR_CENTER
 	case ENV_PRO:
@@ -20,6 +21,8 @@ func init() {
 	default:
 		host = DEV_HOST_MONITOR_CENTER
 	}
+
+	jobId, _ = strconv.ParseInt(os.Getenv(driver.JobID), 10, 64)
 
 	currentConfig = NewConfig(
 		Service(os.Getenv(driver.ServiceName)),

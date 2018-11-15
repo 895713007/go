@@ -15,7 +15,9 @@ import (
 
 const (
 	Env         = "CONFIG_SERVER"
+	EnvType     = "ENV_TYPE"
 	ServiceName = "SERVICE_NAME"
+	JobID       = "JOB_ID"
 	CodeSuccess = 0
 )
 
