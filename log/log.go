@@ -2,47 +2,81 @@ package log
 
 import (
 	"os"
-	"github.com/sirupsen/logrus"
-	"github.com/rs/xid"
+	"path/filepath"
+	"time"
+
 	"github.com/json-iterator/go"
+	"github.com/lestrrat-go/file-rotatelogs"
+	"github.com/rs/xid"
+	"github.com/sirupsen/logrus"
 )
-
-const (
-	PanicLevel logrus.Level = iota
-	FatalLevel
-	ErrorLevel
-	WarnLevel
-	InfoLevel
-	DebugLevel
-)
-
-const typeField = "log_type"
-
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-
-var log = logrus.New()
-var extra map[string]interface{}
-var uniqueId string
 
 func init() {
-	log.SetOutput(os.Stdout)
+	log = logrus.New()
+	json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-	if _level, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err == nil {
-		logrus.Infof("set level %s %s", _level, os.Getenv("LOG_LEVEL"))
-		log.SetLevel(_level)
+	// set log level
+	if lvl, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err == nil {
+		log.SetLevel(lvl)
 	} else {
 		log.SetLevel(DebugLevel)
 	}
-	Debugf("level %s", log.Level)
 
-	server := os.Getenv("LOG_SERVER")
-	if server != "" {
+	// set log formatter
+	formatter := new(logrus.TextFormatter)
+	formatter.TimestampFormat = "2006-01-02 15:03:04"
+	formatter.FieldMap = logrus.FieldMap{
+		logrus.FieldKeyTime:  "[T]",
+		logrus.FieldKeyLevel: "[L]",
+		logrus.FieldKeyMsg:   "[Msg]",
+	}
+	log.SetFormatter(formatter)
+
+	// add es log hook
+	if server := os.Getenv("LOG_SERVER"); server != "" {
 		log.AddHook(NewEsLogHook(server))
 	}
 
 	SetExtra(map[string]interface{}{
 		"command": os.Args[0],
 	})
+
+	logFilename := getLogFilename()
+	rotateLog, _ := rotatelogs.New(
+		logFilename+".%Y%m%d",
+		rotatelogs.WithLinkName(logFilename),
+		rotatelogs.WithMaxAge(24*time.Duration(defMaxRolls)*time.Hour),
+		rotatelogs.WithRotationTime(24*time.Hour),
+	)
+
+	log.Out = rotateLog
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+func Init(maxRolls uint32, filename string) error {
+	logFilename := getLogFilename(filename)
+	if path := filepath.Dir(logFilename); !isDirExists(path) {
+		if err := os.MkdirAll(path, 0744); err != nil {
+			logrus.Errorf("Mkdirall %s err: %v", path, err)
+			return err
+		}
+	}
+
+	rotateLog, err := rotatelogs.New(
+		logFilename+".%Y%m%d",
+		rotatelogs.WithLinkName(logFilename),
+		rotatelogs.WithMaxAge(24*time.Duration(maxRolls)*time.Hour),
+		rotatelogs.WithRotationTime(24*time.Hour),
+	)
+	if err != nil {
+		logrus.Errorf("create rotate log err: %v", err)
+		return err
+	}
+
+	log.Out = rotateLog
+
+	return nil
 }
 
 func SetLevel(level logrus.Level) {
@@ -169,4 +203,37 @@ func Fatalf(format string, v ...interface{}) {
 
 func Fatalln(v ...interface{}) {
 	log.Fatalln(v...)
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+func isDirExists(path string) bool {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return os.IsExist(err)
+	} else {
+		return fi.IsDir()
+	}
+}
+
+func getLogFilename(filename ...string) string {
+	var jobId, serviceName, logFilename string
+
+	if len(filename) == 0 {
+		if jobId = os.Getenv("JOB_ID"); jobId == "" {
+			jobId = "0"
+		}
+		if serviceName = os.Getenv("SERVICE_NAME"); serviceName == "" {
+			serviceName = "undefined"
+		}
+		logFilename = defLogPath + jobId + "_" + serviceName + "/" + defLogFile
+	} else {
+		logFilename = filename[0]
+	}
+
+	if !filepath.IsAbs(logFilename) {
+		logFilename, _ = filepath.Abs(logFilename)
+	}
+
+	return logFilename
 }

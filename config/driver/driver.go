@@ -12,17 +12,18 @@ type Driver interface {
 }
 
 var (
-	DefaultDriver = NewFileDriver(Path("./config.toml"))
+	DefaultConfigFile = "./config.toml"
+	DefaultDriver     = NewFileDriver(Path(DefaultConfigFile))
 )
 
 type Option func(*Options)
 
 type Options struct {
-	Path string     //for file driver
-	Host string     //for http driver
-	Timeout time.Duration
+	Path      string //for file driver
+	Host      string //for http driver
+	Timeout   time.Duration
 	SubDriver Driver //for cache driver
-	TTL time.Duration
+	TTL       time.Duration
 }
 
 func Host(host string) Option {

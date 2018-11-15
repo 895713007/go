@@ -1,15 +1,16 @@
 package config
 
 import (
+	"os"
+	"runtime/debug"
+	"time"
+
 	"github.com/mytokenio/go/config/driver"
 	"github.com/mytokenio/go/log"
-	"os"
-	"time"
-	"runtime/debug"
 )
 
 const (
-	DefaultWatchInterval = 5 * time.Second
+	DefaultWatchInterval = 60 * time.Second
 	DefaultServicePrefix = "mt.service."
 )
 
@@ -23,17 +24,20 @@ type Config struct {
 
 type OnChangeFn func() error
 
+// get config object
+func GetConfig() *Config {
+	return currentConfig
+}
+
 func NewConfig(opts ...Option) *Config {
 	if os.Getenv(driver.Env) != "" {
 		driver.DefaultDriver = driver.NewHttpDriver()
 	}
 
 	options := newOptions(opts...)
-	log.Debugf("config driver %s", options.Driver)
 
 	//use cache driver if ttl > 0
 	if options.TTL > 0 {
-		log.Infof("ttl %s, use cache driver", options.TTL.String())
 		cacheDriver := driver.NewCacheDriver(
 			driver.SubDriver(options.Driver),
 			driver.TTL(options.TTL),
@@ -54,7 +58,7 @@ func NewFileConfig(path string) *Config {
 	)
 }
 
-func NewHttpConfig(service string, driverOpts ... driver.Option) *Config {
+func NewHttpConfig(service string, driverOpts ...driver.Option) *Config {
 	httpDriver := driver.NewHttpDriver(driverOpts...)
 
 	return NewConfig(
@@ -64,7 +68,7 @@ func NewHttpConfig(service string, driverOpts ... driver.Option) *Config {
 }
 
 //loop monitor if config changed ?
-func (c *Config) Watch(fn OnChangeFn, duration ... time.Duration) {
+func (c *Config) Watch(fn OnChangeFn, duration ...time.Duration) {
 	c.OnChange = fn
 	c.doOnChange()
 

@@ -2,10 +2,10 @@ package log
 
 import (
 	"fmt"
+	"net"
 	"os"
 
 	"github.com/sirupsen/logrus"
-	"net"
 )
 
 const (

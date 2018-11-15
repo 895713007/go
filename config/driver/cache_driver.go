@@ -39,7 +39,7 @@ func NewCacheDriver(opts ...Option) Driver {
 	if options.SubDriver == nil {
 		options.SubDriver = DefaultDriver
 	}
-	log.Infof("cache sub driver %s", options.SubDriver.String())
+
 	return &cacheDriver{
 		TTL:       minTTL,
 		SubDriver: options.SubDriver,

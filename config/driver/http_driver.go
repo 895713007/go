@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	Env = "CONFIG_SERVER"
+	Env         = "CONFIG_SERVER"
+	ServiceName = "SERVICE_NAME"
 	CodeSuccess = 0
 )
 
