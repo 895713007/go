@@ -102,6 +102,5 @@ func Panic(err error) {
 func Alarm(alarmMsg string) {
 	if len(alarmMsg) > 0 {
 		alarm(alarmMsg)
-		Gauge("status", STATUS_ERROR)
 	}
 }
