@@ -33,7 +33,7 @@ func GetConfig() *Config {
 }
 
 func NewConfig(opts ...Option) *Config {
-	if os.Getenv(driver.Env) != "" {
+	if os.Getenv(driver.EnvConfigServer) != "" {
 		driver.DefaultDriver = driver.NewHttpDriver()
 	}
 

@@ -13,7 +13,7 @@ import (
 func init() {
 	var host string
 
-	switch strings.ToLower(os.Getenv(driver.EnvType)) {
+	switch strings.ToLower(os.Getenv(driver.Env)) {
 	case ENV_BETA:
 		host = BETA_HOST_MONITOR_CENTER
 	case ENV_PRO:

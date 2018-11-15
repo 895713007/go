@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	Env         = "CONFIG_SERVER"
-	EnvType     = "ENV_TYPE"
-	ServiceName = "SERVICE_NAME"
-	JobID       = "JOB_ID"
-	CodeSuccess = 0
+	EnvConfigServer = "CONFIG_SERVER"
+	Env             = "ENV"
+	ServiceName     = "SERVICE_NAME"
+	JobID           = "JOB_ID"
+	CodeSuccess     = 0
 )
 
 type httpDriver struct {
@@ -78,7 +78,7 @@ func NewHttpDriver(opts ...Option) Driver {
 	}
 
 	if options.Host == "" {
-		options.Host = os.Getenv(Env)
+		options.Host = os.Getenv(EnvConfigServer)
 	}
 
 	return &httpDriver{
