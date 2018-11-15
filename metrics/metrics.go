@@ -98,3 +98,10 @@ func Panic(err error) {
 	Gauge("exit_code", EXIT_CODE_ERROR)
 	panic(err)
 }
+
+func Alarm(alarmMsg string) {
+	if len(alarmMsg) > 0 {
+		alarm(alarmMsg)
+		Gauge("status", STATUS_ERROR)
+	}
+}

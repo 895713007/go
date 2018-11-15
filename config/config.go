@@ -15,14 +15,15 @@ const (
 )
 
 type Config struct {
-	Service  string
-	Tags     []string
-	Driver   driver.Driver
-	OnChange OnChangeFn
-	checkSum string
+	Service   string
+	Tags      []string
+	Driver    driver.Driver
+	OnChange  OnChangeFn
+	checkSum  string
+	isWatched bool
 }
 
-type OnChangeFn func() error
+type OnChangeFn func(string) error
 
 // get config object
 func GetConfig() *Config {
@@ -70,8 +71,13 @@ func NewHttpConfig(service string, driverOpts ...driver.Option) *Config {
 //loop monitor if config changed ?
 func (c *Config) Watch(fn OnChangeFn, duration ...time.Duration) {
 	c.OnChange = fn
-	c.doOnChange()
+	c.watchChange()
 
+	if c.isWatched {
+		return
+	}
+
+	c.isWatched = true
 	interval := DefaultWatchInterval
 	if len(duration) > 0 {
 		interval = duration[0]
@@ -95,21 +101,21 @@ func (c *Config) watchChange() {
 	}
 	log.Infof("watchChange %v %s %s", v, v.CheckSum, c.checkSum)
 	if v.CheckSum != c.checkSum {
-		err = c.doOnChange()
+		err = c.doOnChange(string(v.V))
 		if err == nil {
 			c.checkSum = v.CheckSum
 		}
 	}
 }
 
-func (c *Config) doOnChange() error {
+func (c *Config) doOnChange(configData string) error {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Errorf("OnChange callback panic %v %s", r, debug.Stack())
 		}
 	}()
 
-	if err := c.OnChange(); err != nil {
+	if err := c.OnChange(configData); err != nil {
 		log.Errorf("OnChange callback error %s", err)
 		return err
 	}
