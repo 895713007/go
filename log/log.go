@@ -24,7 +24,7 @@ func init() {
 
 	// set log formatter
 	formatter := new(logrus.TextFormatter)
-	formatter.TimestampFormat = "2006-01-02 15:03:04"
+	formatter.TimestampFormat = "2006-01-02 15:04:05"
 	formatter.FieldMap = logrus.FieldMap{
 		logrus.FieldKeyTime:  "[T]",
 		logrus.FieldKeyLevel: "[L]",

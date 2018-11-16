@@ -1,7 +1,12 @@
 package metrics
 
 import (
+	"bytes"
 	"encoding/json"
+	"math"
+	"os/exec"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -30,6 +35,7 @@ func reportStateFactory() {
 		EnvType:     globalServiceInfo.envType,
 		Host:        globalServiceInfo.host,
 		ProcessID:   globalServiceInfo.processID,
+		Memory:      getMemoryPercent(),
 		Extend:      make(map[string]interface{}),
 	}
 
@@ -148,4 +154,70 @@ func callback() error {
 				suc.Topic, string(failValue), fail.Err.Error())
 		}
 	}
+}
+
+func getMemoryPercent() int {
+	pid := strconv.Itoa(globalServiceInfo.processID)
+
+	ps := exec.Command("ps", "-eo", "pid,pmem")
+	grep := exec.Command("grep", pid)
+	result, _, err := pipeline(ps, grep)
+	if err != nil {
+		log.Errorf("get process %mem err: %v", err)
+		return 0
+	}
+
+	lines := strings.Split(string(result), "\n")
+	for i := 0; i < len(lines); i++ {
+		lineFields := strings.Fields(lines[i])
+		if len(lineFields) == 2 && lineFields[0] == pid {
+			men, _ := strconv.ParseFloat(lineFields[1], 10)
+			memPer, _ := math.Modf(men)
+			return int(memPer)
+		}
+	}
+
+	return 0
+}
+
+func pipeline(cmds ...*exec.Cmd) ([]byte, []byte, error) {
+	if len(cmds) < 1 {
+		return nil, nil, nil
+	}
+
+	var output bytes.Buffer
+	var stderr bytes.Buffer
+	var err error
+	maxIndex := len(cmds) - 1
+	cmds[maxIndex].Stdout = &output
+	cmds[maxIndex].Stderr = &stderr
+
+	for i, cmd := range cmds[:maxIndex] {
+		if i == maxIndex {
+			break
+		}
+
+		cmds[i+1].Stdin, err = cmd.StdoutPipe()
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	// Start each command
+	for _, cmd := range cmds {
+		err := cmd.Start()
+		if err != nil {
+			return output.Bytes(), stderr.Bytes(), err
+		}
+	}
+
+	// Wait for each command to complete
+	for _, cmd := range cmds {
+		err := cmd.Wait()
+		if err != nil {
+			return output.Bytes(), stderr.Bytes(), err
+		}
+	}
+
+	return output.Bytes(), stderr.Bytes(), nil
 }
