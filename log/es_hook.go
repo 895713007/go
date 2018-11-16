@@ -39,7 +39,7 @@ type logInfo struct {
 func NewEsLogHook(server string) *EsLogHook {
 	conn, err := net.Dial("udp", server)
 	if err != nil {
-		logrus.Errorf("failed dial log server %v", server)
+		log.Errorf("failed dial log server %v", server)
 		os.Exit(1)
 	}
 	return &EsLogHook{server, conn}
@@ -72,7 +72,7 @@ func (hook *EsLogHook) Fire(entry *logrus.Entry) error {
 	b, _ := json.Marshal(msg)
 	_, err := hook.Conn.Write(b)
 	if err != nil {
-		logrus.Errorf("log server write error: %s", err)
+		log.Errorf("log server write error: %s", err)
 
 		//retry TODO
 	}

@@ -30,5 +30,9 @@ const (
 )
 
 const (
-	defMaxRolls = 7
+	defMaxRolls    = 7
+	envLogToFile   = "LOG_TO_FILE"  // write log to file
+	envLogServer   = "LOG_SERVER"   // log server
+	envJobID       = "JOB_ID"       // job id
+	envServiceName = "SERVICE_NAME" // service name
 )

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/cihub/seelog"
 	"github.com/mytokenio/go/log"
 )
 
@@ -28,6 +27,10 @@ func cronMonitor() {
 }
 
 func reportStateFactory() {
+	if globalKafka.producer == nil {
+		return
+	}
+
 	now := time.Now().Unix()
 	rs := ReportStatePkg{
 		JobID:       globalServiceInfo.jobID,
@@ -85,19 +88,36 @@ func reportStateFactory() {
 		return
 	}
 
-	globalKafka.chanStateProducerValue <- string(value)
+	globalKafka.mutex.Lock()
+	defer globalKafka.mutex.Unlock()
+
+	if len(globalKafka.chanStateProducerValue) > default_producer_msg_caps-2 {
+		log.Errorf("chanStateProducerValue is full, content: %+v", rs)
+		return
+	} else {
+		globalKafka.chanStateProducerValue <- string(value)
+	}
 }
 
 func alarm(content string) {
-	if content != "" {
-		ra := ReportAlarmPkg{
-			JobID:       globalServiceInfo.jobID,
-			ServiceName: globalServiceInfo.serviceName,
-			Content:     content,
-			HearTime:    time.Now().Unix(),
+	if content != "" && globalKafka.producer != nil {
+
+		globalKafka.mutex.Lock()
+		defer globalKafka.mutex.Unlock()
+
+		if len(globalKafka.chanAlarmProducerValue) > default_producer_msg_caps-2 {
+			log.Errorf("chanAlarmProducer is full, content: %s", content)
+			return
+		} else {
+			ra := ReportAlarmPkg{
+				JobID:       globalServiceInfo.jobID,
+				ServiceName: globalServiceInfo.serviceName,
+				Content:     content,
+				HearTime:    time.Now().Unix(),
+			}
+			pkg, _ := json.Marshal(ra)
+			globalKafka.chanAlarmProducerValue <- string(pkg)
 		}
-		pkg, _ := json.Marshal(ra)
-		globalKafka.chanAlarmProducerValue <- string(pkg)
 	}
 }
 
@@ -146,11 +166,11 @@ func callback() error {
 			return nil
 		case suc = <-globalKafka.producer.Successes():
 			sucValue, _ = suc.Value.Encode()
-			seelog.Infof("send alarm msg success. [T:%s P:%d O:%d M:%s]",
+			log.Infof("send alarm msg success. [T:%s P:%d O:%d M:%s]",
 				suc.Topic, suc.Partition, suc.Offset, string(sucValue))
 		case fail = <-globalKafka.producer.Errors():
 			failValue, _ = fail.Msg.Value.Encode()
-			seelog.Errorf("send alarm msg failed: [T:%s M:%s], err: %s",
+			log.Errorf("send alarm msg failed: [T:%s M:%s], err: %s",
 				suc.Topic, string(failValue), fail.Err.Error())
 		}
 	}

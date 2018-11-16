@@ -1,6 +1,8 @@
 package metrics
 
 import (
+	"sync"
+
 	"github.com/Shopify/sarama"
 )
 
@@ -38,6 +40,7 @@ type serviceInfo struct {
 }
 
 type kafkaInfo struct {
+	mutex                  sync.Mutex
 	isInitialized          bool
 	producer               sarama.AsyncProducer
 	brokers                []string

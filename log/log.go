@@ -3,6 +3,7 @@ package log
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/json-iterator/go"
@@ -33,7 +34,7 @@ func init() {
 	log.SetFormatter(formatter)
 
 	// add es log hook
-	if server := os.Getenv("LOG_SERVER"); server != "" {
+	if server := os.Getenv(envLogServer); server != "" {
 		log.AddHook(NewEsLogHook(server))
 	}
 
@@ -41,15 +42,16 @@ func init() {
 		"command": os.Args[0],
 	})
 
-	logFilename := getLogFilename()
-	rotateLog, _ := rotatelogs.New(
-		logFilename+".%Y%m%d",
-		rotatelogs.WithLinkName(logFilename),
-		rotatelogs.WithMaxAge(24*time.Duration(defMaxRolls)*time.Hour),
-		rotatelogs.WithRotationTime(24*time.Hour),
-	)
-
-	log.Out = rotateLog
+	if t, _ := strconv.Atoi(os.Getenv(envLogToFile)); t > 0 {
+		logFilename := getLogFilename()
+		rotateLog, _ := rotatelogs.New(
+			logFilename+".%Y%m%d",
+			rotatelogs.WithLinkName(logFilename),
+			rotatelogs.WithMaxAge(24*time.Duration(defMaxRolls)*time.Hour),
+			rotatelogs.WithRotationTime(24*time.Hour),
+		)
+		log.Out = rotateLog
+	}
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -58,7 +60,7 @@ func Init(maxRolls uint32, filename string) error {
 	logFilename := getLogFilename(filename)
 	if path := filepath.Dir(logFilename); !isDirExists(path) {
 		if err := os.MkdirAll(path, 0744); err != nil {
-			logrus.Errorf("Mkdirall %s err: %v", path, err)
+			log.Errorf("Mkdirall %s err: %v", path, err)
 			return err
 		}
 	}
@@ -70,7 +72,7 @@ func Init(maxRolls uint32, filename string) error {
 		rotatelogs.WithRotationTime(24*time.Hour),
 	)
 	if err != nil {
-		logrus.Errorf("create rotate log err: %v", err)
+		log.Errorf("create rotate log err: %v", err)
 		return err
 	}
 
@@ -220,10 +222,10 @@ func getLogFilename(filename ...string) string {
 	var jobId, serviceName, logFilename string
 
 	if len(filename) == 0 {
-		if jobId = os.Getenv("JOB_ID"); jobId == "" {
+		if jobId = os.Getenv(envJobID); jobId == "" {
 			jobId = "0"
 		}
-		if serviceName = os.Getenv("SERVICE_NAME"); serviceName == "" {
+		if serviceName = os.Getenv(envServiceName); serviceName == "" {
 			serviceName = "undefined"
 		}
 		logFilename = defLogPath + jobId + "_" + serviceName + "/" + defLogFile
