@@ -43,10 +43,18 @@ func Close() {
 	reportStateFactory()
 
 	// resource recovery
-	close(exitChan)
-	close(globalKafka.chanStateProducerValue)
-	close(globalKafka.chanAlarmProducerValue)
-	globalKafka.producer.Close()
+	if exitChan != nil {
+		close(exitChan)
+	}
+	if globalKafka.chanStateProducerValue != nil {
+		close(globalKafka.chanStateProducerValue)
+	}
+	if globalKafka.chanAlarmProducerValue != nil {
+		close(globalKafka.chanAlarmProducerValue)
+	}
+	if globalKafka.producer != nil {
+		globalKafka.producer.Close()
+	}
 
 	for key, _ := range countMap {
 		delete(countMap, key)
