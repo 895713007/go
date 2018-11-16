@@ -63,6 +63,62 @@ func Close() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+func GetCount(id string) (int64, bool) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if v, ok := countMap[id]; !ok {
+		return 0, false
+	} else {
+		return v, true
+	}
+}
+
+func GetCountMap() map[string]int64 {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	return countMap
+}
+
+func GetGaugeInt64(id string) (int64, bool) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if v, ok := gaugeIntMap[id]; !ok {
+		return 0, false
+	} else {
+		return v, true
+	}
+}
+
+func GetGaugeInt64Map() map[string]int64 {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	return gaugeIntMap
+}
+
+func GetGaugeStr(id string) (string, bool) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if v, ok := gaugeStrMap[id]; !ok {
+		return "", false
+	} else {
+		return v, true
+	}
+}
+
+func GetGaugeStrMap() map[string]string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	return gaugeStrMap
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 func StatusOK() {
 	Gauge("status", STATUS_OK)
 }

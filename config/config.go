@@ -101,7 +101,7 @@ func (c *Config) watchChange() {
 		log.Errorf("error get config %s %s", c.Service, err)
 		return
 	}
-	log.Infof("watchChange %v %s %s", v, v.CheckSum, c.checkSum)
+	log.Debugf("watchChange %v %s %s", v, v.CheckSum, c.checkSum)
 	if v.CheckSum != c.checkSum {
 		err = c.doOnChange(string(v.V))
 		if err == nil {
