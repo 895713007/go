@@ -31,6 +31,7 @@ func reportStateFactory() {
 		return
 	}
 
+	extend := make(map[string]interface{})
 	now := time.Now().Unix()
 	rs := ReportStatePkg{
 		JobID:       globalServiceInfo.jobID,
@@ -39,7 +40,6 @@ func reportStateFactory() {
 		Host:        globalServiceInfo.host,
 		ProcessID:   globalServiceInfo.processID,
 		Memory:      getMemoryPercent(),
-		Extend:      make(map[string]interface{}),
 	}
 
 	if v, ok := gaugeIntMap["status"]; !ok {
@@ -68,17 +68,23 @@ func reportStateFactory() {
 	// set extend
 	for key, value := range countMap {
 		if !isDefaultKey[key] {
-			rs.Extend[key] = value
+			extend[key] = value
 		}
 	}
 	for key, value := range gaugeIntMap {
 		if !isDefaultKey[key] {
-			rs.Extend[key] = value
+			extend[key] = value
 		}
 	}
 	for key, value := range gaugeStrMap {
 		if !isDefaultKey[key] {
-			rs.Extend[key] = value
+			extend[key] = value
+		}
+	}
+
+	if len(extend) > 0 {
+		if extendC, err := json.Marshal(extend); err == nil {
+			rs.Extend = string(extendC)
 		}
 	}
 

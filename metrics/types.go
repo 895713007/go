@@ -7,21 +7,21 @@ import (
 )
 
 type ReportStatePkg struct {
-	JobID       int64                  `json:"job_id"`
-	ServiceName string                 `json:"service_name"`
-	Status      int                    `json:"status"`
-	EnvType     int                    `json:"env_type"`
-	StartTime   int64                  `json:"start_time"`
-	StopTime    int64                  `json:"stop_time"`
-	HearTime    int64                  `json:"hear_time"`
-	ExitCode    int                    `json:"exit_code"`
-	Host        string                 `json:"host"`
-	ProcessID   int                    `json:"process_id"`
-	Memory      int                    `json:"memory"`
-	Load        int                    `json:"load"`
-	NetIn       int64                  `json:"net_in"`
-	NetOut      int64                  `json:"net_out"`
-	Extend      map[string]interface{} `json:"extend"`
+	JobID       int64  `json:"job_id"`
+	ServiceName string `json:"service_name"`
+	Status      int    `json:"status"`
+	EnvType     int    `json:"env_type"`
+	StartTime   int64  `json:"start_time"`
+	StopTime    int64  `json:"stop_time"`
+	HearTime    int64  `json:"hear_time"`
+	ExitCode    int    `json:"exit_code"`
+	Host        string `json:"host"`
+	ProcessID   int    `json:"process_id"`
+	Memory      int    `json:"memory"`
+	Load        int    `json:"load"`
+	NetIn       int64  `json:"net_in"`
+	NetOut      int64  `json:"net_out"`
+	Extend      string `json:"extend"`
 }
 
 type ReportAlarmPkg struct {
