@@ -166,12 +166,24 @@ func callback() error {
 			return nil
 		case suc = <-globalKafka.producer.Successes():
 			sucValue, _ = suc.Value.Encode()
-			log.Infof("send alarm msg success. [T:%s P:%d O:%d M:%s]",
-				suc.Topic, suc.Partition, suc.Offset, string(sucValue))
+			if suc.Topic == globalKafka.reportAlarmTopic {
+				log.Infof("send alarm msg success. [T:%s P:%d O:%d M:%s]",
+					suc.Topic, suc.Partition, suc.Offset, string(sucValue))
+			} else {
+				log.Infof("send state msg success. [T:%s P:%d O:%d M:%s]",
+					suc.Topic, suc.Partition, suc.Offset, string(sucValue))
+			}
+
 		case fail = <-globalKafka.producer.Errors():
 			failValue, _ = fail.Msg.Value.Encode()
-			log.Errorf("send alarm msg failed: [T:%s M:%s], err: %s",
-				suc.Topic, string(failValue), fail.Err.Error())
+			if fail.Msg.Topic == globalKafka.reportAlarmTopic {
+				log.Errorf("send alarm msg failed: [T:%s M:%s], err: %s",
+					fail.Msg.Topic, string(failValue), fail.Err.Error())
+			} else {
+				log.Errorf("send state msg failed: [T:%s M:%s], err: %s",
+					fail.Msg.Topic, string(failValue), fail.Err.Error())
+			}
+
 		}
 	}
 }
