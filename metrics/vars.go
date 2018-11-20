@@ -16,7 +16,7 @@ var (
 )
 
 var (
-	cronInterval = 120 * time.Second // 定时任务的间隔时间
+	cronInterval = 10 * time.Second // 定时任务的间隔时间
 )
 
 var isDefaultKey = map[string]bool{
