@@ -53,9 +53,9 @@ func reportStateFactory() {
 	}
 
 	if v, ok := gaugeIntMap["hear_time"]; ok {
-		rs.HearTime = v
+		rs.HeartTime = v
 	} else {
-		rs.HearTime = now
+		rs.HeartTime = now
 	}
 
 	if v, ok := gaugeIntMap["stop_time"]; ok {
@@ -123,7 +123,7 @@ func alarm(content string) {
 				JobID:       globalServiceInfo.jobID,
 				ServiceName: globalServiceInfo.serviceName,
 				Content:     content,
-				HearTime:    time.Now().Unix(),
+				HeartTime:   time.Now().Unix(),
 			}
 			pkg, _ := json.Marshal(ra)
 			globalKafka.chanAlarmProducerValue <- string(pkg)

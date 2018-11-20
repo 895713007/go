@@ -13,7 +13,7 @@ type ReportStatePkg struct {
 	EnvType     int    `json:"env_type"`
 	StartTime   int64  `json:"start_time"`
 	StopTime    int64  `json:"stop_time"`
-	HearTime    int64  `json:"hear_time"`
+	HeartTime   int64  `json:"heart_time"`
 	ExitCode    int    `json:"exit_code"`
 	Host        string `json:"host"`
 	ProcessID   int    `json:"process_id"`
@@ -28,7 +28,7 @@ type ReportAlarmPkg struct {
 	JobID       int64  `json:"job_id"`
 	ServiceName string `json:"service_name"`
 	Content     string `json:"content"`
-	HearTime    int64  `json:"hear_time"`
+	HeartTime   int64  `json:"heart_time"`
 }
 
 type serviceInfo struct {
