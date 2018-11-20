@@ -58,6 +58,10 @@ func reportStateFactory() {
 		rs.HearTime = now
 	}
 
+	if v, ok := gaugeIntMap["stop_time"]; ok {
+		rs.StopTime = v
+	}
+
 	if v, ok := gaugeIntMap["exit_code"]; ok {
 		rs.ExitCode = int(v)
 		if v > 0 {

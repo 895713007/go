@@ -38,12 +38,16 @@ func Gauge(id string, value interface{}) {
 }
 
 func Close() {
+	Gauge("stop_time", time.Now().Unix())
+
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	// report cache data
-	Gauge("stop_time", time.Now().Unix())
 	reportStateFactory()
+
+	// wait for send msg
+	time.Sleep(1 * time.Second)
 
 	// resource recovery
 	if exitChan != nil {
