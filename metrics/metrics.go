@@ -1,5 +1,7 @@
 package metrics
 
+import "time"
+
 func Count(id string, delta int64) {
 	if id == "" {
 		return
@@ -40,6 +42,7 @@ func Close() {
 	defer mutex.Unlock()
 
 	// report cache data
+	Gauge("stop_time", time.Now().Unix())
 	reportStateFactory()
 
 	// resource recovery
