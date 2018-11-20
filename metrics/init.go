@@ -3,6 +3,7 @@ package metrics
 import (
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -16,17 +17,17 @@ func init() {
 	gaugeStrMap = make(map[string]string, default_map_caps)
 
 	var envType int
-	var broker, serviceName string
+	var brokers, serviceName string
 	switch os.Getenv(ENV_ENV_TYPE) {
 	case ENV_BETA:
 		envType = ENV_TYPE_BETA
-		broker = beta_default_kafka_broker
+		brokers = beta_default_kafka_brokers
 	case ENV_PRO:
 		envType = ENV_TYPE_PRO
-		broker = pro_default_kafka_broker
+		brokers = pro_default_kafka_brokers
 	default:
 		envType = ENV_TYPE_DEV
-		broker = dev_default_kafka_broker
+		brokers = dev_default_kafka_brokers
 	}
 
 	// init serviceInfo value
@@ -41,7 +42,7 @@ func init() {
 	globalServiceInfo.host = host
 	globalServiceInfo.processID = os.Getpid()
 
-	err := initKafka([]string{broker}, default_roport_state_topic, default_roport_alarm_topic)
+	err := initKafka(strings.Split(brokers, ","), default_roport_state_topic, default_roport_alarm_topic)
 	if err != nil {
 		log.Errorf("default init kafka err: %v", err)
 		return
