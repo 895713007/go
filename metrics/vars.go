@@ -39,8 +39,8 @@ var isDefaultKey = map[string]bool{
 // ---------------------------------------------------------------------------------------------------------------------
 
 const (
-	STATUS_ERROR     = 0 // 状态异常
-	STATUS_OK        = 1 // 状态正常
+	STATUS_ERROR     = 1 // 状态异常
+	STATUS_OK        = 0 // 状态正常
 	EXIT_CODE_UNEXIT = 0 // 服务未退出
 	EXIT_CODE_OK     = 1 // 服务正常退出
 	EXIT_CODE_ERROR  = 2 // 服务异常退出
