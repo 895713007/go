@@ -1,6 +1,10 @@
 package metrics
 
-import "time"
+import (
+	"time"
+
+	"github.com/mytokenio/go/log"
+)
 
 func Count(id string, delta int64) {
 	if id == "" {
@@ -15,6 +19,8 @@ func Count(id string, delta int64) {
 	} else {
 		countMap[id] += delta
 	}
+
+	log.Debugf("metrics Count[%s] = %d, delta: %d", id, countMap[id], delta)
 }
 
 func Gauge(id string, value interface{}) {
@@ -35,9 +41,13 @@ func Gauge(id string, value interface{}) {
 	default:
 		return
 	}
+
+	log.Debugf("metrics Gauge[%s] = %v", id, value)
 }
 
 func Close() {
+	log.Debug("metrics Close()")
+
 	Gauge("stop_time", time.Now().Unix())
 
 	mutex.Lock()
@@ -135,19 +145,27 @@ func GetGaugeStrMap() map[string]string {
 // ---------------------------------------------------------------------------------------------------------------------
 
 func StatusOK() {
+	log.Debug("metrics StatusOK()")
+
 	Gauge("status", STATUS_OK)
 }
 
 func StatusError() {
+	log.Debug("metrics StatusError()")
+
 	Gauge("status", STATUS_ERROR)
 }
 
 func ExitWithOK() {
+	log.Debug("metrics ExitWithOK()")
+
 	Gauge("status", STATUS_OK)
 	Gauge("exit_code", EXIT_CODE_OK)
 }
 
 func ExitWithErr(alarmMsg ...string) {
+	log.Debug("metrics ExitWithErr()")
+
 	if len(alarmMsg) > 0 {
 		alarm(alarmMsg[0])
 	}
@@ -156,6 +174,8 @@ func ExitWithErr(alarmMsg ...string) {
 }
 
 func ExitWithKill(alarmMsg ...string) {
+	log.Debug("metrics ExitWithKill()")
+
 	if len(alarmMsg) > 0 {
 		alarm(alarmMsg[0])
 	}
@@ -164,6 +184,8 @@ func ExitWithKill(alarmMsg ...string) {
 }
 
 func Panic(err error) {
+	log.Debugf("metrics Panic(%s)", err.Error())
+
 	alarm(err.Error())
 	Gauge("status", STATUS_ERROR)
 	Gauge("exit_code", EXIT_CODE_ERROR)
@@ -172,6 +194,8 @@ func Panic(err error) {
 
 func Alarm(alarmMsg string) {
 	if len(alarmMsg) > 0 {
+		log.Debugf("metrics Alarm(%s)", alarmMsg)
+
 		alarm(alarmMsg)
 	}
 }
