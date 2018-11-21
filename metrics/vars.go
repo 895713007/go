@@ -26,7 +26,7 @@ var isDefaultKey = map[string]bool{
 	"env_type":     true,
 	"start_time":   true,
 	"stop_time":    true,
-	"hear_time":    true,
+	"heart_time":   true,
 	"exit_code":    true,
 	"host":         true,
 	"process_id":   true,
@@ -69,7 +69,7 @@ const (
 	default_roport_state_topic = "state_monitor_center"
 	default_roport_alarm_topic = "alarm_monitor_center"
 	dev_default_kafka_brokers  = "dev.kafka.mytoken.org:9092"
-	beta_default_kafka_brokers = "todo"
+	beta_default_kafka_brokers = "172.17.1.63:9092"
 	pro_default_kafka_brokers  = "172.16.0.131:9092,172.16.0.132:9092,172.16.0.133:9092"
 )
 

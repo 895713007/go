@@ -52,7 +52,7 @@ func reportStateFactory() {
 		rs.StartTime = v
 	}
 
-	if v, ok := gaugeIntMap["hear_time"]; ok {
+	if v, ok := gaugeIntMap["heart_time"]; ok {
 		rs.HeartTime = v
 	} else {
 		rs.HeartTime = now
