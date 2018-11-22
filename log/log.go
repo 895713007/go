@@ -17,13 +17,6 @@ func init() {
 	log = logrus.New()
 	json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-	// set log level
-	if lvl, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err == nil {
-		log.SetLevel(lvl)
-	} else {
-		log.SetLevel(DebugLevel)
-	}
-
 	// set log formatter
 	formatter := new(logrus.TextFormatter)
 	formatter.TimestampFormat = "2006-01-02 15:04:05"
@@ -43,20 +36,31 @@ func init() {
 		"command": os.Args[0],
 	})
 
-	var logToFile bool
+	var isNotDev bool
 	switch strings.ToLower(os.Getenv(envEnv)) {
 	case envBeta:
-		logToFile = true
+		isNotDev = true
 	case envPro:
-		logToFile = true
+		isNotDev = true
 	case envTest:
-		logToFile = true
+		isNotDev = true
 	default:
-		logToFile = false
+		isNotDev = false
+	}
+
+	// set log level
+	if lvl, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err == nil {
+		log.SetLevel(lvl)
+	} else {
+		if isNotDev {
+			log.SetLevel(InfoLevel)
+		} else {
+			log.SetLevel(DebugLevel)
+		}
 	}
 
 	envLogToFile, _ := strconv.Atoi(os.Getenv(envLogToFile))
-	if logToFile || envLogToFile > 0 {
+	if isNotDev || envLogToFile > 0 {
 		logFilename := getLogFilename()
 		rotateLog, _ := rotatelogs.New(
 			logFilename+".%Y%m%d",
