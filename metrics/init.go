@@ -18,7 +18,7 @@ func init() {
 
 	var envType int
 	var brokers, serviceName string
-	switch os.Getenv(ENV_ENV_TYPE) {
+	switch strings.ToLower(os.Getenv(ENV_ENV_TYPE)) {
 	case ENV_BETA:
 		envType = ENV_TYPE_BETA
 		brokers = beta_default_kafka_brokers

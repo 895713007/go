@@ -50,7 +50,7 @@ const (
 const (
 	ENV_DEV  = "dev"
 	ENV_BETA = "beta"
-	ENV_PRO  = "pro"
+	ENV_PRO  = "product"
 
 	ENV_TYPE_DEV  = 0
 	ENV_TYPE_BETA = 1
@@ -58,7 +58,7 @@ const (
 
 	ENV_JOB_ID       = "JOB_ID"
 	ENV_SERVICE_NAME = "SERVICE_NAME"
-	ENV_ENV_TYPE     = "ENV_TYPE"
+	ENV_ENV_TYPE     = "ENV"
 
 	DEF_SERVICE_NAME = "undefined"
 )

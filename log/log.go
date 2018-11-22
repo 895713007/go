@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/json-iterator/go"
@@ -42,7 +43,20 @@ func init() {
 		"command": os.Args[0],
 	})
 
-	if t, _ := strconv.Atoi(os.Getenv(envLogToFile)); t > 0 {
+	var logToFile bool
+	switch strings.ToLower(os.Getenv(envEnv)) {
+	case envBeta:
+		logToFile = true
+	case envPro:
+		logToFile = true
+	case envTest:
+		logToFile = true
+	default:
+		logToFile = false
+	}
+
+	envLogToFile, _ := strconv.Atoi(os.Getenv(envLogToFile))
+	if logToFile || envLogToFile > 0 {
 		logFilename := getLogFilename()
 		rotateLog, _ := rotatelogs.New(
 			logFilename+".%Y%m%d",

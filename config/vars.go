@@ -6,9 +6,9 @@ var (
 )
 
 const (
-	ENV_DEV  = "dev"  // 开发环境（默认）
-	ENV_BETA = "beta" // 测试环境
-	ENV_PRO  = "pro"  // 生产环境
+	ENV_DEV  = "dev"     // 开发环境（默认）
+	ENV_BETA = "beta"    // 测试环境
+	ENV_PRO  = "product" // 生产环境
 )
 
 const (

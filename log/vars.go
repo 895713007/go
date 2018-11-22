@@ -35,4 +35,8 @@ const (
 	envLogServer   = "LOG_SERVER"   // log server
 	envJobID       = "JOB_ID"       // job id
 	envServiceName = "SERVICE_NAME" // service name
+	envEnv         = "ENV"          // env
+	envBeta        = "beta"         // beta
+	envTest        = "test"         // test
+	envPro         = "product"      // product
 )
