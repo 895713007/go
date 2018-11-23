@@ -50,9 +50,6 @@ func Close() {
 
 	Gauge("stop_time", time.Now().Unix())
 
-	mutex.Lock()
-	defer mutex.Unlock()
-
 	// report cache data
 	reportStateFactory()
 
@@ -73,17 +70,7 @@ func Close() {
 		globalKafka.producer.Close()
 	}
 
-	for key, _ := range countMap {
-		delete(countMap, key)
-	}
-
-	for key, _ := range gaugeIntMap {
-		delete(gaugeIntMap, key)
-	}
-
-	for key, _ := range gaugeStrMap {
-		delete(gaugeStrMap, key)
-	}
+	closeGlobalMap()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -197,5 +184,24 @@ func Alarm(alarmMsg string) {
 		log.Debugf("metrics Alarm(%s)", alarmMsg)
 
 		alarm(alarmMsg)
+	}
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+func closeGlobalMap() {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	for key, _ := range countMap {
+		delete(countMap, key)
+	}
+
+	for key, _ := range gaugeIntMap {
+		delete(gaugeIntMap, key)
+	}
+
+	for key, _ := range gaugeStrMap {
+		delete(gaugeStrMap, key)
 	}
 }

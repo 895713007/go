@@ -31,70 +31,9 @@ func reportStateFactory() {
 		return
 	}
 
-	extend := make(map[string]interface{})
-	now := time.Now().Unix()
-	rs := ReportStatePkg{
-		JobID:       globalServiceInfo.jobID,
-		ServiceName: globalServiceInfo.serviceName,
-		EnvType:     globalServiceInfo.envType,
-		Host:        globalServiceInfo.host,
-		ProcessID:   globalServiceInfo.processID,
-		Memory:      getMemoryPercent(),
-	}
-
-	if v, ok := gaugeIntMap["status"]; !ok {
-		rs.Status = STATUS_OK
-	} else {
-		rs.Status = int(v)
-	}
-
-	if v, ok := gaugeIntMap["start_time"]; ok {
-		rs.StartTime = v
-	}
-
-	if v, ok := gaugeIntMap["heart_time"]; ok {
-		rs.HeartTime = v
-	} else {
-		rs.HeartTime = now
-	}
-
-	if v, ok := gaugeIntMap["stop_time"]; ok {
-		rs.StopTime = v
-	}
-
-	if v, ok := gaugeIntMap["exit_code"]; ok {
-		rs.ExitCode = int(v)
-		if v > 0 {
-			rs.StopTime = now
-		}
-	}
-
-	// set extend
-	for key, value := range countMap {
-		if !isDefaultKey[key] {
-			extend[key] = value
-		}
-	}
-	for key, value := range gaugeIntMap {
-		if !isDefaultKey[key] {
-			extend[key] = value
-		}
-	}
-	for key, value := range gaugeStrMap {
-		if !isDefaultKey[key] {
-			extend[key] = value
-		}
-	}
-
-	if len(extend) > 0 {
-		if extendC, err := json.Marshal(extend); err == nil {
-			rs.Extend = string(extendC)
-		}
-	}
-
-	value, err := json.Marshal(rs)
+	value, err := getStateProducerValue()
 	if err != nil {
-		log.Errorf("json marshal reportState: %+v err: %v", rs, err)
+		log.Errorf("getStateProducerValue err: %v", err)
 		return
 	}
 
@@ -102,10 +41,10 @@ func reportStateFactory() {
 	defer globalKafka.mutex.Unlock()
 
 	if len(globalKafka.chanStateProducerValue) > default_producer_msg_caps-2 {
-		log.Errorf("chanStateProducerValue is full, content: %+v", rs)
+		log.Warnf("chanStateProducerValue is full, content: %s", value)
 		return
 	} else {
-		globalKafka.chanStateProducerValue <- string(value)
+		globalKafka.chanStateProducerValue <- value
 	}
 }
 
@@ -262,4 +201,77 @@ func pipeline(cmds ...*exec.Cmd) ([]byte, []byte, error) {
 	}
 
 	return output.Bytes(), stderr.Bytes(), nil
+}
+
+func getStateProducerValue() (string, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	extend := make(map[string]interface{})
+	now := time.Now().Unix()
+	rs := ReportStatePkg{
+		JobID:       globalServiceInfo.jobID,
+		ServiceName: globalServiceInfo.serviceName,
+		EnvType:     globalServiceInfo.envType,
+		Host:        globalServiceInfo.host,
+		ProcessID:   globalServiceInfo.processID,
+		Memory:      getMemoryPercent(),
+	}
+
+	if v, ok := gaugeIntMap["status"]; !ok {
+		rs.Status = STATUS_OK
+	} else {
+		rs.Status = int(v)
+	}
+
+	if v, ok := gaugeIntMap["start_time"]; ok {
+		rs.StartTime = v
+	}
+
+	if v, ok := gaugeIntMap["heart_time"]; ok {
+		rs.HeartTime = v
+	} else {
+		rs.HeartTime = now
+	}
+
+	if v, ok := gaugeIntMap["stop_time"]; ok {
+		rs.StopTime = v
+	}
+
+	if v, ok := gaugeIntMap["exit_code"]; ok {
+		rs.ExitCode = int(v)
+		if v > 0 {
+			rs.StopTime = now
+		}
+	}
+
+	// set extend
+	for key, value := range countMap {
+		if !isDefaultKey[key] {
+			extend[key] = value
+		}
+	}
+	for key, value := range gaugeIntMap {
+		if !isDefaultKey[key] {
+			extend[key] = value
+		}
+	}
+	for key, value := range gaugeStrMap {
+		if !isDefaultKey[key] {
+			extend[key] = value
+		}
+	}
+
+	if len(extend) > 0 {
+		if extendC, err := json.Marshal(extend); err == nil {
+			rs.Extend = string(extendC)
+		}
+	}
+
+	value, err := json.Marshal(rs)
+	if err != nil {
+		return "", err
+	}
+
+	return string(value), nil
 }
