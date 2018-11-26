@@ -27,15 +27,6 @@ func init() {
 	}
 	log.SetFormatter(formatter)
 
-	// add es log hook
-	if server := os.Getenv(envLogServer); server != "" {
-		log.AddHook(NewEsLogHook(server))
-	}
-
-	SetExtra(map[string]interface{}{
-		"command": os.Args[0],
-	})
-
 	var isNotDev bool
 	switch strings.ToLower(os.Getenv(envEnv)) {
 	case envBeta:
@@ -47,6 +38,18 @@ func init() {
 	default:
 		isNotDev = false
 	}
+
+	// add es log hook
+	if server := os.Getenv(envLogServer); server != "" {
+		log.AddHook(NewEsLogHook(server))
+	}
+
+	// add line hook
+	log.AddHook(NewLineHook(!isNotDev))
+
+	SetExtra(map[string]interface{}{
+		"command": os.Args[0],
+	})
 
 	// set log level
 	if lvl, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err == nil {
