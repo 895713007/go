@@ -36,6 +36,7 @@ const (
 	envJobID       = "JOB_ID"       // job id
 	envServiceName = "SERVICE_NAME" // service name
 	envEnv         = "ENV"          // env
+	envDev         = "dev"          // dev
 	envBeta        = "beta"         // beta
 	envTest        = "test"         // test
 	envPro         = "product"      // product

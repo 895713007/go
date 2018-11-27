@@ -27,16 +27,23 @@ func init() {
 	}
 	log.SetFormatter(formatter)
 
-	var isNotDev bool
+	var isLocal, isDev bool
 	switch strings.ToLower(os.Getenv(envEnv)) {
+	case envDev:
+		isDev = true
+		isLocal = false
 	case envBeta:
-		isNotDev = true
+		isDev = false
+		isLocal = false
 	case envPro:
-		isNotDev = true
+		isDev = false
+		isLocal = false
 	case envTest:
-		isNotDev = true
+		isDev = false
+		isLocal = false
 	default:
-		isNotDev = false
+		isDev = true
+		isLocal = true
 	}
 
 	// add es log hook
@@ -45,7 +52,7 @@ func init() {
 	}
 
 	// add line hook
-	log.AddHook(NewLineHook(!isNotDev))
+	log.AddHook(NewLineHook(isDev))
 
 	SetExtra(map[string]interface{}{
 		"command": os.Args[0],
@@ -55,15 +62,15 @@ func init() {
 	if lvl, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL")); err == nil {
 		log.SetLevel(lvl)
 	} else {
-		if isNotDev {
-			log.SetLevel(InfoLevel)
-		} else {
+		if isDev {
 			log.SetLevel(DebugLevel)
+		} else {
+			log.SetLevel(InfoLevel)
 		}
 	}
 
 	envLogToFile, _ := strconv.Atoi(os.Getenv(envLogToFile))
-	if isNotDev || envLogToFile > 0 {
+	if !isLocal || envLogToFile > 0 {
 		logFilename := getLogFilename()
 		rotateLog, _ := rotatelogs.New(
 			logFilename+".%Y%m%d",
