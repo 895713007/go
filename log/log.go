@@ -69,8 +69,17 @@ func init() {
 		}
 	}
 
+	var debug bool
+	if len(os.Args) > 1 {
+		for _, arg := range os.Args[1:] {
+			if arg == "-debug" {
+				debug = true
+			}
+		}
+	}
+
 	envLogToFile, _ := strconv.Atoi(os.Getenv(envLogToFile))
-	if !isLocal || envLogToFile > 0 {
+	if !debug && (!isLocal || envLogToFile > 0) {
 		logFilename := getLogFilename()
 		rotateLog, _ := rotatelogs.New(
 			logFilename+".%Y%m%d",
