@@ -18,7 +18,7 @@ type LineHook struct {
 func NewLineHook(debug bool) *LineHook {
 	return &LineHook{
 		debug: debug,
-		Field: "[Line]",
+		Field: "[Fn]",
 		Skip:  5,
 		Formatter: func(file, function string, line int) string {
 			return fmt.Sprintf("%s:%d", file, line)
