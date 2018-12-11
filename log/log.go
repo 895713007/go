@@ -274,5 +274,11 @@ func getLogFilename(filename ...string) string {
 		logFilename, _ = filepath.Abs(logFilename)
 	}
 
+	if path := filepath.Dir(logFilename); !isDirExists(path) {
+		if err := os.MkdirAll(path, 0744); err != nil {
+			log.Errorf("Mkdirall %s err: %v", path, err)
+		}
+	}
+
 	return logFilename
 }
