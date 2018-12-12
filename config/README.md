@@ -10,10 +10,6 @@ import (
 )
 ```
 
-set env for http driver
-
-`CONFIG_SERVER`  `http://xxx.com` 
-
 #### Service Config
 
 custom struct 
@@ -22,39 +18,14 @@ custom struct
 type MyConfig struct {...}
 ```
 
-
-set service name by `config.Service`
-```
-// config with http driver
-c := config.NewConfig(
-    config.Service("user"),
-    config.TTL(time.Second * 10), //cache ttl
-    config.Driver(
-        driver.NewHttpDriver(
-            driver.Host("http://xxx.com"),
-            driver.Timeout(time.Second * 3),
-        ),
-    ),
-)
-```
-
+bind config like this:
 ```
 mc := &MyConfig{}
+c := config.GetConfig()
 c.BindJSON(mc)
 // or
 c.BindTOML(mc)
 ```
-
-code equal to
-```
-mc := &MyConfig{}
-b, _ := c.GetServiceConfig()
-
-json.Unmarshal(b, mc)
-// or
-toml.Unmarshal(b, mc)
-```
-
 
 ### Watch Change
 

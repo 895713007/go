@@ -2,7 +2,7 @@
 
 ## Log
 
-log based on `logrus`, support sync to mytoken log server
+log based on `logrus`, support sync to mytoken log server, default write log to /data/logs/
 
 ```
 go get github.com/mytokenio/go/log
@@ -32,7 +32,7 @@ import (
 )
 
 mc := &MyConfig{}
-c := config.NewConfig()
+c := config.GetConfig()
 
 // bind to struct
 c.BindTOML(mc)
@@ -50,28 +50,17 @@ c.Watch(func() error {
 ## Metrics
 
 ```go
-//import metrics backend service
-import "github.com/mytokenio/go/metrics/logger"
+// import metrics backend service
+import "github.com/mytokenio/go/metrics"
 
-//init with metrics namespace and logger server address
-m := logger.New("test", "127.0.0.1:12333")
-defer m.Close()
+// defer to close metrics
+defer metrics.Close()
 
-//create counter/gauge instance
-c := m.Counter("counter")
-g := m.Gauge("test-gauge")
+// count/gauge usage
+metrics.Count("key", 1)
+metrics.Gauge("key", 1)
+metrics.Gauge("key", "string_value")
 
-//call counter/gauge
-c.Incr(10)
-log.Infof("counter value %d", c.Value())
-
-g.Set(1234)
-log.Infof("gauge value %d", g.Value())
-
-// with kv pair
-c.With("k1": "v1", "k2", "v2", ...).Incr(123)
-
-g.With("k1": "v1", "k2", "v2", ...).Set(123)
 ```
 
 [more detail](https://github.com/mytokenio/go/tree/master/metrics)
