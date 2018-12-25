@@ -1,8 +1,10 @@
-hash: da84e1d3dd53ae8dfe347df87174ba503727c61419f39d6099eb184a5105e6f3
-updated: 2018-12-07T18:11:49.489234+08:00
+hash: 1b4888e05b776dd7c79ce8b1fb7ec00994fe457ad76d37242124ed54fe8c8a92
+updated: 2018-12-25T10:36:56.800321+08:00
 imports:
 - name: github.com/BurntSushi/toml
   version: 3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005
+- name: github.com/DataDog/zstd
+  version: c7161f8c63c045cbc7ca051dcc969dd0e4054de2
 - name: github.com/davecgh/go-spew
   version: d8f796af33cc11cb798c1aaeb27a4ebc5099927d
   subpackages:
@@ -15,6 +17,8 @@ imports:
   version: 776d5712da21bc4762676d614db1d8a64f4238b0
 - name: github.com/eapache/queue
   version: 093482f3f8ce946c05bcba64badd2c82369e084d
+- name: github.com/go-sql-driver/mysql
+  version: 72cd26f257d44c1114970e19afddcd812016007e
 - name: github.com/golang/snappy
   version: 2e65f85255dbc3072edf28d6b5b8efc472979f5a
 - name: github.com/json-iterator/go
@@ -32,7 +36,7 @@ imports:
 - name: github.com/modern-go/reflect2
   version: 94122c33edd36123c84d5368cfb2b69df93a0ec8
 - name: github.com/mytokenio/go
-  version: 2071f19c36b182a783c8f30b9fa8fd13a4c6179f
+  version: 9e30a0c9835c4ae87de24dc1459ed5b6da1cc755
   subpackages:
   - config/driver
   - log
@@ -48,7 +52,7 @@ imports:
 - name: github.com/rs/xid
   version: 15d26544def341f036c5f8dca987a4cbe575032c
 - name: github.com/Shopify/sarama
-  version: ec843464b50d4c8b56403ec9d589cf41ea30e722
+  version: a6144ae922fd99dd0ea5046c8137acfb7fab0914
 - name: github.com/sirupsen/logrus
   version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
 - name: golang.org/x/crypto
@@ -58,12 +62,18 @@ imports:
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: 70b957f3b65e069b4930ea94e2721eefa0f8f695
+  version: 2a47403f2ae58167c4d75973960ccc62b28cb0d8
   repo: https://github.com/golang/sys
   vcs: git
   subpackages:
   - unix
   - windows
+- name: google.golang.org/appengine
+  version: a37df1387b4521194676d88c79230c613610d5f4
+  repo: https://github.com/golang/appengine
+  vcs: git
+  subpackages:
+  - cloudsql
 - name: google.golang.org/grpc
   version: df014850f6dee74ba2fc94874043a9f3f75fbfd8
   repo: https://github.com/grpc/grpc-go

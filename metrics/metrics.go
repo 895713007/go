@@ -32,10 +32,26 @@ func Gauge(id string, value interface{}) {
 	defer mutex.Unlock()
 
 	switch value.(type) {
-	case int:
-		gaugeIntMap[id] = int64(value.(int))
+	case uint8:
+		gaugeIntMap[id] = int64(value.(uint8))
+	case uint16:
+		gaugeIntMap[id] = int64(value.(uint16))
+	case uint32:
+		gaugeIntMap[id] = int64(value.(uint32))
+	case uint64:
+		gaugeIntMap[id] = int64(value.(uint64))
+	case uint:
+		gaugeIntMap[id] = int64(value.(uint))
+	case int8:
+		gaugeIntMap[id] = int64(value.(int8))
+	case int16:
+		gaugeIntMap[id] = int64(value.(int16))
+	case int32:
+		gaugeIntMap[id] = int64(value.(int32))
 	case int64:
 		gaugeIntMap[id] = int64(value.(int64))
+	case int:
+		gaugeIntMap[id] = int64(value.(int))
 	case string:
 		gaugeStrMap[id] = value.(string)
 	default:
@@ -171,12 +187,14 @@ func ExitWithKill(alarmMsg ...string) {
 }
 
 func Panic(err error) {
-	log.Debugf("metrics Panic(%s)", err.Error())
+	if err != nil {
+		log.Debugf("metrics Panic(%s)", err.Error())
 
-	alarm(err.Error())
-	Gauge("status", STATUS_ERROR)
-	Gauge("exit_code", EXIT_CODE_ERROR)
-	panic(err)
+		alarm(err.Error())
+		Gauge("status", STATUS_ERROR)
+		Gauge("exit_code", EXIT_CODE_ERROR)
+		panic(err)
+	}
 }
 
 func Alarm(alarmMsg string) {
