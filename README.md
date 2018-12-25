@@ -38,7 +38,7 @@ c := config.GetConfig()
 c.BindTOML(mc)
 
 // or, watch change
-c.Watch(func() error {
+c.Watch(func(configString string) error {
     err := c.BindTOML(mc)
     // TODO
     return nil

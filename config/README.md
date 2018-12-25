@@ -31,7 +31,7 @@ c.BindTOML(mc)
 
 default watch interval 5 seconds,
 ```
-c.Watch(func() error {
+c.Watch(func(configString string) error {
     err := c.BindTOML(mc)
     if err != nil {
         log.Errorf("config bind error %s", err)
