@@ -17,17 +17,18 @@ func init() {
 	gaugeStrMap = make(map[string]string, default_map_caps)
 
 	var envType int
-	var brokers, serviceName string
+	var serviceName string
+	var brokers []string
 	switch strings.ToLower(os.Getenv(ENV_ENV_TYPE)) {
 	case ENV_BETA:
 		envType = ENV_TYPE_BETA
-		brokers = beta_default_kafka_brokers
+		brokers = strings.Split(beta_default_kafka_brokers, ",")
 	case ENV_PRO:
 		envType = ENV_TYPE_PRO
-		brokers = pro_default_kafka_brokers
+		brokers = strings.Split(pro_default_kafka_brokers, ",")
 	default:
 		envType = ENV_TYPE_DEV
-		brokers = dev_default_kafka_brokers
+		brokers = strings.Split(dev_default_kafka_brokers, ",")
 	}
 
 	// init serviceInfo value
@@ -42,9 +43,27 @@ func init() {
 	globalServiceInfo.host = host
 	globalServiceInfo.processID = os.Getpid()
 
-	err := initKafka(strings.Split(brokers, ","), default_roport_state_topic, default_roport_alarm_topic)
+	err := initKafka(brokers, default_roport_state_topic, default_roport_alarm_topic)
 	if err != nil {
 		log.Errorf("default init kafka err: %v", err)
+
+		// kafka init retry
+		go func(brokers []string) {
+			for {
+				time.Sleep(2 * time.Second)
+				if globalKafka.isInitialized {
+					return
+				}
+
+				err := initKafka(brokers, default_roport_state_topic, default_roport_alarm_topic)
+				if err != nil {
+					log.Errorf("default init kafka err: %v", err)
+					continue
+				}
+				return
+			}
+		}(brokers)
+
 		return
 	}
 }

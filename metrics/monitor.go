@@ -161,6 +161,26 @@ func getMemoryPercent() int {
 	return 0
 }
 
+func getLoad() int {
+	cmd := exec.Command("uptime")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Errorf("get pc load by uptime err: %v", err)
+		return 0
+	}
+
+	outSlice := strings.Split(string(out), " ")
+	outLen := len(outSlice)
+	if outLen > 3 {
+		loadStr := strings.TrimSpace(strings.Trim(outSlice[outLen-3], ","))
+		load, _ := strconv.ParseFloat(loadStr, 10)
+		loadAvg, _ := math.Modf(load)
+		return int(loadAvg)
+	}
+
+	return 0
+}
+
 func pipeline(cmds ...*exec.Cmd) ([]byte, []byte, error) {
 	if len(cmds) < 1 {
 		return nil, nil, nil
@@ -216,6 +236,7 @@ func getStateProducerValue() (string, error) {
 		Host:        globalServiceInfo.host,
 		ProcessID:   globalServiceInfo.processID,
 		Memory:      getMemoryPercent(),
+		Load:        getLoad(),
 	}
 
 	if v, ok := gaugeIntMap["status"]; !ok {

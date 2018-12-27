@@ -66,27 +66,32 @@ func Close() {
 
 	Gauge("stop_time", time.Now().Unix())
 
-	// report cache data
-	reportStateFactory()
+	go func() {
 
-	// wait for send msg
-	time.Sleep(1 * time.Second)
+		// report cache data
+		reportStateFactory()
 
-	// resource recovery
-	if exitChan != nil {
-		close(exitChan)
-	}
-	if globalKafka.chanStateProducerValue != nil {
-		close(globalKafka.chanStateProducerValue)
-	}
-	if globalKafka.chanAlarmProducerValue != nil {
-		close(globalKafka.chanAlarmProducerValue)
-	}
-	if globalKafka.producer != nil {
-		globalKafka.producer.Close()
-	}
+		// wait for send msg
+		time.Sleep(500 * time.Millisecond)
 
-	closeGlobalMap()
+		// resource recovery
+		if exitChan != nil {
+			close(exitChan)
+		}
+		if globalKafka.chanStateProducerValue != nil {
+			close(globalKafka.chanStateProducerValue)
+		}
+		if globalKafka.chanAlarmProducerValue != nil {
+			close(globalKafka.chanAlarmProducerValue)
+		}
+		if globalKafka.producer != nil {
+			globalKafka.producer.Close()
+		}
+
+		closeGlobalMap()
+	}()
+
+	time.Sleep(1000 * time.Millisecond)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
