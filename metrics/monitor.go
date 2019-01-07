@@ -144,7 +144,7 @@ func getMemoryPercent() int {
 	grep := exec.Command("grep", pid)
 	result, _, err := pipeline(ps, grep)
 	if err != nil {
-		log.Errorf("get process %mem err: %v", err)
+		log.Errorf("get process memory err: %v", err)
 		return 0
 	}
 
