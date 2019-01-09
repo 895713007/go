@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -32,7 +33,6 @@ func init() {
 	}
 
 	// init serviceInfo value
-	host, _ := os.Hostname()
 	jobId, _ := strconv.ParseInt(os.Getenv(ENV_JOB_ID), 10, 64)
 	if serviceName = os.Getenv(ENV_SERVICE_NAME); serviceName == "" {
 		serviceName = DEF_SERVICE_NAME
@@ -40,7 +40,7 @@ func init() {
 	globalServiceInfo.jobID = jobId
 	globalServiceInfo.serviceName = serviceName
 	globalServiceInfo.envType = envType
-	globalServiceInfo.host = host
+	globalServiceInfo.host = getHost()
 	globalServiceInfo.processID = os.Getpid()
 
 	err := initKafka(brokers, default_roport_state_topic, default_roport_alarm_topic)
@@ -112,4 +112,25 @@ func createProducer(brokers []string) (sarama.AsyncProducer, error) {
 		return nil, err
 	}
 	return producer, nil
+}
+
+func getHost() string {
+	hosts := "/etc/hosts"
+	file, err := ioutil.ReadFile(hosts)
+	if err != nil {
+		log.Errorf("read hosts: %s failed | %v", err)
+		return ""
+	}
+
+	lines := strings.Split(string(file), "\n")
+	length := len(lines)
+
+	for i := length - 1; i > 0; i-- {
+		line := strings.TrimSpace(lines[i])
+		lineSlice := strings.Fields(line)
+		if len(lineSlice) == 2 && len(lineSlice[1]) == 12 {
+			return lineSlice[1]
+		}
+	}
+	return ""
 }
