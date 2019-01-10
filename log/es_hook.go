@@ -72,9 +72,7 @@ func (hook *EsLogHook) Fire(entry *logrus.Entry) error {
 	b, _ := json.Marshal(msg)
 	_, err := hook.Conn.Write(b)
 	if err != nil {
-		log.Errorf("log server write error: %s", err)
-
-		//retry TODO
+		fmt.Printf("es log hook write failed, msg_size: %dKB, error: %s\n", len(b)/1024, err.Error())
 	}
 	return nil
 }
